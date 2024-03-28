@@ -3,6 +3,12 @@
 #include "wire_handlers.h"
 
 int main (int argc, char *argv[]) {
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <pcap>\n", argv[0]);
+		return 1;
+	}
+
+	const char *filename = argv[1];
 
 	char errbuf[PCAP_ERRBUF_SIZE];
 	pcap_t *handle;
@@ -16,7 +22,7 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "File does not contain Ethernet data\n");
 		return 1;
 	}
-	if (pcap_loop(handle, -1, packet_handler, NULL) < 0) {
+	if (pcap_loop(handle, -1, callback, NULL) < 0) {
 		fprintf(stderr, "Error reading packets: %s\n", pcap_geterr(handle));
 		return 1;
 	}
