@@ -28,6 +28,7 @@ void packet_handler(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u
 	return;
 }
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
+	printf("Callback ran\n");
 	// print the start date and time of the packet capture
 
 	// print duration of the packet capture in seconds with microsecond resolution
