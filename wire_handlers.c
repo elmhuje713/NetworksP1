@@ -1,13 +1,14 @@
 #include <pcap.h>
-// /usr/include/net
-// /usr/include/netinet
-// ntohs & ntohl (read values that span multiple bytes)
+
 #include <netinet/ether.h>
 #include <netinet/if_ether.h>
 #include <net/ethernet.h>
 
 #include <netinet/ip.h>
 #include <netinet/in.h>
+
+#include <netinet/tcp.h>
+#include <netinet/udp.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,9 +74,56 @@ u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, c
 	return eptr->ether_type;
 }
 // network layer
-void process_ip(const u_char *packet){ 
+void process_ip(const u_char *packet, int packet_len) { 
+	struct ether_header *eth_header = (struct ether_header *)packet;
+	if (ntohs(eth_header->ether_type) == ETHERTYPE_IP) {
+		struct ip *ip_header = (struct ip *)(packet + sizeof(struct ether_header));
+		printf("IP Header:\n");
+		ip_print(ip_header);
+		if (ip_header->ip_p == IPPROTO_TCP) {
+			struct tcphdr *tcp_header = (struct tcphdr *)(packet + sizeof(struct ether_header) + sizeof(struct ip));
+			printf("TCP Header:\n");
+			tcp_print(tcp_header);
+		} else if (ip_header->ip_p == IPPROTO_UDP) {
+			struct udphdr *udp_header = (struct udphdr *)(packet + sizeof(struct ether_header) + sizeof(struct ip));
+			printf("UDP Header:\n");
+			udp_print(udp_header);
+		}
+
+	} else {
+		printf("Not an IP packet.\n");
+	}
 	return;
 }
+void udp_print(const struct udphdr *udp_header) {
+	printf("UDP Source Port: %u\n", ntohs(udp_header->source));
+	printf("UDP Destination Port: %u\n", ntohs(udp_header->dest));
+	printf("UDP Length: %u\n", ntohs(udp_header->len));
+	printf("UDP Checksum: 0x%04x\n", ntohs(udp_header->check));
+}
+void tcp_print(const struct tcphdr *tcp_header) {
+	printf("TCP Source Port: %u\n", ntohs(tcp_header->source));
+	printf("TCP Destination Port: %u\n", ntohs(tcp_header->dest));
+	printf("TCP Sequence Number: %u\n", ntohl(tcp_header->seq));
+	printf("TCP Acknowledgement Number: %u\n", ntohl(tcp_header->ack_seq));
+	printf("TCP Header Length: %u bytes\n", tcp_header->doff*4);
+	printf("TCP Flags:");
+	if (tcp_header->syn) printf("SYN");
+	if (tcp_header->ack) printf("ACK");
+	if (tcp_header->fin) printf("FIN");
+	if (tcp_header->rst) printf("RST");
+	if (tcp_header->psh) printf("PSH");
+	if (tcp_header->urg) printf("URG");
+	printf("\n");
+}
+void ip_print(const struct ip *ip_header) {
+	printf("IP Version: %u\n", ip_header->ip_v);
+	printf("IP Header Length: %u bytes\n", ip_header->ip_hl*4);
+	printf("IP Total Length: %u bytes\n", ntohs(ip_header->ip_len));
+	printf("IP Source Address: %s\n", inet_ntoa(ip_header->ip_src));
+	printf("IP Destination Address: %s\n", inet_ntoa(ip_header->ip_dst));
+}
+
 u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
 	const struct my_ip* ip;
 	int len;
@@ -89,10 +137,14 @@ u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_c
 		return NULL;
 	}
 	len = ntohs(ip->ip_len);
+
+	process_ip(packet, length);
+
 	hlen = IP_HL(ip);
 	version = IP_V(ip);
 	if (version != 4) {
 		fprintf(stdout,"Unknown version %d\n", version);
+		return NULL;
 	}
 	if (hlen < 5) {
 		fprintf(stdout, "bad-hlen %d \n",hlen);
@@ -102,6 +154,7 @@ u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_c
 	}
 	off = ntohs(ip->ip_off);
 	if((off & 0x1fff) == 0) {
+		fprintf(stdout,"IP: ");
 		fprintf(stdout,"%s ", inet_ntoa(ip->ip_src));
 		fprintf(stdout, "%s %d %d %d %d\n", inet_ntoa(ip->ip_dst),hlen, version,len,off);
 	}
@@ -124,6 +177,7 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	count++;
 //	process_ethernet(packet);
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
+	handle_IP(user_data, pkthdr, packet);
 	if (type == ETHERTYPE_IP) {
 		handle_IP(user_data,pkthdr,packet);
 	} else if (type == ETHERTYPE_ARP) {
