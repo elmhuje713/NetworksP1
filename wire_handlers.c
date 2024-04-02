@@ -201,15 +201,16 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	count++;
 //	process_ethernet(packet);
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
-	handle_IP(user_data, pkthdr, packet);
-	if (type == ETHERTYPE_IP) {
-		//handle_IP(user_data,pkthdr,packet);
-	} else if (type == ETHERTYPE_ARP) {
-//		handle_ARP(user_data,pkthdr, packet);
+	printf("%d\n", type);
+	//handle_IP(user_data, pkthdr, packet);
+	if (type == 8) {
+		handle_IP(user_data,pkthdr,packet);
+	} else if (type == 1544) {
+		handle_ARP(user_data,pkthdr, packet);
 	} else if (type == ETHERTYPE_REVARP) {
 	
 	}
-	handle_ARP(user_data, pkthdr, packet);
+//	handle_ARP(user_data, pkthdr, packet);
 	// print the start date and time of the packet capture
 
 	// print duration of the packet capture in seconds with microsecond resolution
