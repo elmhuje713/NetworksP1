@@ -19,5 +19,5 @@ int compare_packets(struct pac* pacs, int num_packets, int response);
 void udp_print(const struct udphdr *udp_header);
 void tcp_print(const struct tcphdr *tcp_header);
 void ip_print(const struct ip *ip_header);
-
+void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
 #endif /* WIRE_HANDLERS_H */

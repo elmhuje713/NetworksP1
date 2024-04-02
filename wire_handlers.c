@@ -10,6 +10,8 @@
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
 
+#include <net/if_arp.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,6 +23,7 @@
 #define BLU "\x1B[34m"
 #define CYN "\x1B[36m"
 #define GRN "\x1B[32m"
+#define YEL "\x1B[33m"
 #define WHT "\x1B[37m"
 #define MAG "\x1B[35m"
 #define RESET "\x1B[0m"
@@ -103,13 +106,13 @@ void process_ip(const u_char *packet, int packet_len) {
 	return;
 }
 void udp_print(const struct udphdr *udp_header) {
-	printf("UDP Source Port: %u\n", ntohs(udp_header->source));
+	printf(BLU"UDP Source Port: %u\n", ntohs(udp_header->source));
 	printf("UDP Destination Port: %u\n", ntohs(udp_header->dest));
 	printf("UDP Length: %u\n", ntohs(udp_header->len));
-	printf("UDP Checksum: 0x%04x\n", ntohs(udp_header->check));
+	printf("UDP Checksum: 0x%04x\n"RESET, ntohs(udp_header->check));
 }
 void tcp_print(const struct tcphdr *tcp_header) {
-	printf("TCP Source Port: %u\n", ntohs(tcp_header->source));
+	printf(GRN"TCP Source Port: %u\n", ntohs(tcp_header->source));
 	printf("TCP Destination Port: %u\n", ntohs(tcp_header->dest));
 	printf("TCP Sequence Number: %u\n", ntohl(tcp_header->seq));
 	printf("TCP Acknowledgement Number: %u\n", ntohl(tcp_header->ack_seq));
@@ -121,7 +124,7 @@ void tcp_print(const struct tcphdr *tcp_header) {
 	if (tcp_header->rst) printf("RST");
 	if (tcp_header->psh) printf("PSH");
 	if (tcp_header->urg) printf("URG");
-	printf("\n");
+	printf("\n"RESET);
 }
 void ip_print(const struct ip *ip_header) {
 	printf(MAG"IP Version: %u\n", ip_header->ip_v);
@@ -167,8 +170,22 @@ u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_c
 	}
 	return NULL;
 }
+void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
+	struct arphdr *arphdr; /* net/if_arp */
+        arphdr = (struct arphdr *) packet;
+        fprintf(stdout, YEL "ARP Hardware Type: %u\n", arphdr->ar_hrd);
+        fprintf(stdout, "ARP Protocol Type: %u\n", arphdr->ar_pro);
+	fprintf(stdout, "ARP Hardware Address Length: %u bytes\n", arphdr->ar_hln);
+	fprintf(stdout, "ARP Protocol Address Length: %u bytes\n"RESET, arphdr->ar_pln);
+//	fprintf(stdout, "ARP Sender Hardware Address: %s\n", arphdr->__ar_sha[ETH_ALEN]);
+//	fprintf(stdout, "ARP Sender IP Address: %s\n", arphdr->__ar_sip[4]);
+//	fprintf(stdout, "ARP Target Hardware Address: %s\n", arphdr->__ar_tha[ETH_ALEN]);
+//	fprintf(stdout, "ARP Target IP Address: %s\n"RESET, arphdr->__ar_tip[4]);
+	return;
+}
 // network layer
 void process_arp(const u_char *packet){ 
+	
 	return;
 }
 // transport layer
@@ -186,11 +203,13 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
 	handle_IP(user_data, pkthdr, packet);
 	if (type == ETHERTYPE_IP) {
-		handle_IP(user_data,pkthdr,packet);
+		//handle_IP(user_data,pkthdr,packet);
 	} else if (type == ETHERTYPE_ARP) {
-		
+//		handle_ARP(user_data,pkthdr, packet);
 	} else if (type == ETHERTYPE_REVARP) {
+	
 	}
+	handle_ARP(user_data, pkthdr, packet);
 	// print the start date and time of the packet capture
 
 	// print duration of the packet capture in seconds with microsecond resolution
