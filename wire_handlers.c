@@ -18,6 +18,12 @@
 
 #include "wire_handlers.h"
 // only IPv4 header processing is required
+#define BLU "\x1B[34m"
+#define CYN "\x1B[36m"
+#define GRN "\x1B[32m"
+#define WHT "\x1B[37m"
+#define MAG "\x1B[35m"
+#define RESET "\x1B[0m"
 
 struct my_ip {
 	u_int8_t 		ip_vhl;
@@ -57,11 +63,12 @@ void process_ethernet(const u_char *packet){
 u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
 	struct ether_header *eptr; /* net/ethernet.h */
 	eptr = (struct ether_header *) packet;
-	fprintf(stdout, "ethernet header source %s", ether_ntoa((const struct ether_addr *)&eptr->ether_shost));
-	fprintf(stdout," destination: %s ", ether_ntoa((const struct ether_addr *)&eptr->ether_dhost));
+//	printf(KBLU "hi\n" RESET);
+	fprintf(stdout, CYN "ethernet header source %s" RESET, ether_ntoa((const struct ether_addr *)&eptr->ether_shost));
+	fprintf(stdout, CYN " destination: %s " RESET, ether_ntoa((const struct ether_addr *)&eptr->ether_dhost));
 
 	if (ntohs (eptr->ether_type) == ETHERTYPE_IP) {
-		fprintf(stdout,"(IP)");
+		fprintf(stdout,MAG"(IP)"RESET);
 	} else if (ntohs (eptr->ether_type) == ETHERTYPE_ARP) {
 		fprintf(stdout,"(ARP)");
 	} else if (ntohs (eptr->ether_type) == ETHERTYPE_REVARP){
@@ -78,7 +85,7 @@ void process_ip(const u_char *packet, int packet_len) {
 	struct ether_header *eth_header = (struct ether_header *)packet;
 	if (ntohs(eth_header->ether_type) == ETHERTYPE_IP) {
 		struct ip *ip_header = (struct ip *)(packet + sizeof(struct ether_header));
-		printf("IP Header:\n");
+		printf(MAG"IP Header:\n"RESET);
 		ip_print(ip_header);
 		if (ip_header->ip_p == IPPROTO_TCP) {
 			struct tcphdr *tcp_header = (struct tcphdr *)(packet + sizeof(struct ether_header) + sizeof(struct ip));
@@ -117,11 +124,11 @@ void tcp_print(const struct tcphdr *tcp_header) {
 	printf("\n");
 }
 void ip_print(const struct ip *ip_header) {
-	printf("IP Version: %u\n", ip_header->ip_v);
+	printf(MAG"IP Version: %u\n", ip_header->ip_v);
 	printf("IP Header Length: %u bytes\n", ip_header->ip_hl*4);
 	printf("IP Total Length: %u bytes\n", ntohs(ip_header->ip_len));
 	printf("IP Source Address: %s\n", inet_ntoa(ip_header->ip_src));
-	printf("IP Destination Address: %s\n", inet_ntoa(ip_header->ip_dst));
+	printf("IP Destination Address: %s\n"RESET, inet_ntoa(ip_header->ip_dst));
 }
 
 u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
