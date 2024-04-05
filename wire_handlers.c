@@ -92,11 +92,11 @@ void process_ip(const u_char *packet, int packet_len) {
 		ip_print(ip_header);
 		if (ip_header->ip_p == IPPROTO_TCP) {
 			struct tcphdr *tcp_header = (struct tcphdr *)(packet + sizeof(struct ether_header) + sizeof(struct ip));
-			printf("TCP Header:\n");
+			printf(GRN "TCP Header:\n" RESET);
 			tcp_print(tcp_header);
 		} else if (ip_header->ip_p == IPPROTO_UDP) {
 			struct udphdr *udp_header = (struct udphdr *)(packet + sizeof(struct ether_header) + sizeof(struct ip));
-			printf("UDP Header:\n");
+			printf(BLU "UDP Header:\n" RESET);
 			udp_print(udp_header);
 		}
 
@@ -197,8 +197,13 @@ void packet_handler(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u
 }
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 	static int count = 1;
+	static int max_pkt_len = 0;;
+	static int min_pkt_len = 1000;
+	static int total_pkt_len = 0;
 	printf("Callback ran: %d\n", count);
 	count++;
+
+	
 //	process_ethernet(packet);
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
 	printf("%d\n", type);
@@ -210,6 +215,17 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	} else if (type == ETHERTYPE_REVARP) {
 	
 	}
+
+	total_pkt_len += pkthdr->caplen;
+	if (pkthdr->caplen > max_pkt_len) {
+		max_pkt_len = pkthdr->caplen;
+	}
+ 	if (pkthdr->caplen < min_pkt_len) {
+		min_pkt_len = pkthdr->caplen;
+	}
+	printf("min packet length: %d\n", min_pkt_len);
+	printf("max packet length: %d\n", max_pkt_len);
+	printf("total length of packets: %d\n", total_pkt_len);
 //	handle_ARP(user_data, pkthdr, packet);
 	// print the start date and time of the packet capture
 
