@@ -208,12 +208,12 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
 	printf("%d\n", type);
 	//handle_IP(user_data, pkthdr, packet);
-	if (type == 8) {
+	if (type == 8) {	// IP
 		handle_IP(user_data,pkthdr,packet);
-	} else if (type == 1544) {
+	} else if (type == 1544) { // ARP
 		handle_ARP(user_data,pkthdr, packet);
 	} else if (type == ETHERTYPE_REVARP) {
-	
+		printf("REV ARP");
 	}
 
 	total_pkt_len += pkthdr->caplen;
