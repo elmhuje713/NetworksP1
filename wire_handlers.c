@@ -206,11 +206,12 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	
 //	process_ethernet(packet);
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
-	printf("%d\n", type);
+	// printf("type%d\n", type);
+	// printf("ntohs%d\n", ntohs(type));
 	//handle_IP(user_data, pkthdr, packet);
-	if (type == 8) {
+	if (ntohs(type) == ETHERTYPE_IP) {
 		handle_IP(user_data,pkthdr,packet);
-	} else if (type == 1544) {
+	} else if (ntohs(type) == ETHERTYPE_ARP) {
 		handle_ARP(user_data,pkthdr, packet);
 	} else if (type == ETHERTYPE_REVARP) {
 	
