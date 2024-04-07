@@ -1,33 +1,48 @@
 #ifndef WIRE_HANDLERS_H
 #define WIRE_HANDLERS_H
+
+#include <netinet/ip.h>
+#include <pcap.h>
+
+#include <netinet/ether.h>
+#include <netinet/if_ether.h>
+#include <net/ethernet.h>
+
+#include <netinet/ip.h>
+#include <netinet/in.h>
+
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
-#include <netinet/ip.h>
+
+#include <net/if_arp.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include <string.h>
+
+#define BLU "\x1B[34m"
+#define CYN "\x1B[36m"
+#define GRN "\x1B[32m"
+#define YEL "\x1B[33m"
+#define WHT "\x1B[37m"
+#define MAG "\x1B[35m"
+#define RESET "\x1B[0m"
+
 struct prog_output {
-	int start_time;
-	int start_date;
-	int cap_duration;	// in seconds with microsecond resolution
-	int total_num_pkts;
+	int packet_number;
 
-//	struct ip_eth_info* senders[];
-//	struct ip_eth_info* recipients[];
+	struct pcap_pkthdr packet_time_info;	// this contains timeval from which we can access times in seconds with microsecond resolution
 
-//	struct arp_machine* arp_machines[];
+	struct ether_header eth_info;
+	struct ip ip_info;
 
-//	int udp_port_srcs[];
-//	int udp_port_dests[];
+	struct arphdr arp_machine_info;
 
-	int max_pkt_len;
-	int min_pkt_len;
-	int av_pkt_len;
-	
+	struct udphdr udp_info;
+	struct tcphdr tcp_info;
 };
-
-//struct arp_machine {
-//	int ips[];
-//	int macs[];
-//};
-
 
 struct my_ip {
         u_int8_t                ip_vhl;
@@ -48,7 +63,6 @@ struct my_ip {
 
 void process_ip(const u_char *packet, int packet_len);
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
-//int compare_packets(struct pac* pacs, int num_packets, int response);
 void udp_print(const struct udphdr *udp_header);
 void tcp_print(const struct tcphdr *tcp_header);
 void ip_print(const struct ip *ip_header);

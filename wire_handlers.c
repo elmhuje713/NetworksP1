@@ -1,32 +1,4 @@
-#include <pcap.h>
-
-#include <netinet/ether.h>
-#include <netinet/if_ether.h>
-#include <net/ethernet.h>
-
-#include <netinet/ip.h>
-#include <netinet/in.h>
-
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
-
-#include <net/if_arp.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include <string.h>
-
 #include "wire_handlers.h"
-// only IPv4 header processing is required
-#define BLU "\x1B[34m"
-#define CYN "\x1B[36m"
-#define GRN "\x1B[32m"
-#define YEL "\x1B[33m"
-#define WHT "\x1B[37m"
-#define MAG "\x1B[35m"
-#define RESET "\x1B[0m"
 
 u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
 	struct ether_header *eptr; /* net/ethernet.h */
@@ -158,7 +130,7 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	static int total_pkt_len = 0;
 	printf("Callback ran: %d\n", count);
 	count++;
-	our_output->total_num_pkts = count;
+	our_output->packet_number = count;
 	
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
 	
@@ -183,31 +155,3 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 
 	return;
 }
-/**
-int compare_packets(struct pac* pacs, int num_packets, int response) {
-	int maximum = 0;
-	int minimum = pacs[0].length;
-	int all_sizes = 0;
-
-	for (int c = 0; c < num_packets; c++ ) {
-		all_sizes += pacs[c].length;
-
-        	if (pacs[c].length > maximum) {
-			maximum = pacs[c].length;
-        	}
-		if (pacs[c].length < minimum) {
-			minimum = pacs[c].length;
-		}
-	}
-	if (response == 0) {			// return average 0
-		return all_sizes / num_packets;
-	}
-	if (response == 1) { 			// return max 1
-		return maximum;
-	}
-	if (response == 2) {			// return min 2
-		return minimum;
-	}
-        return 0;
-}
-*/
