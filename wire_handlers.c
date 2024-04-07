@@ -28,45 +28,10 @@
 #define MAG "\x1B[35m"
 #define RESET "\x1B[0m"
 
-struct my_ip {
-	u_int8_t 		ip_vhl;
-	#define IP_V(ip) 	(((ip)->ip_vhl & 0xf0) >> 4)
-	#define IP_HL(ip)	((ip)->ip_vhl & 0x0f)
-	u_int8_t		ip_tos;
-	u_int16_t		ip_len;
-	u_int16_t		ip_id;
-	u_int16_t		ip_off;
-	#define IP_DF 0x4000
-	#define IP_MF 0x2000
-	#define IP_OFFMASK 0x1fff
-	u_int8_t		ip_ttl;
-	u_int8_t		ip_p;
-	u_int16_t		ip_sum;	
-	struct in_addr		ip_src, ip_dst;
-};
-
-// transport layer
-void process_ethernet(const u_char *packet){
-	struct ether_addr eth_addr;
-	memcpy(&eth_addr, packet, 6);
-	
-	char *ascii_addr = ether_ntoa(&eth_addr);
-	int result = ether_hostton((const char*)packet, &eth_addr);
-	printf("Ethernet address: %s\n", ascii_addr);
-
-	if (result == 0) {
-		printf("Ethernet address for %s is %s\n", packet, ascii_addr);
-	} else {
-		printf("Failed to get Ethernet address for %s\n", packet);
-	}
-
-	return;
-}
-
 u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
 	struct ether_header *eptr; /* net/ethernet.h */
 	eptr = (struct ether_header *) packet;
-//	printf(KBLU "hi\n" RESET);
+
 	fprintf(stdout, CYN "ethernet header source %s" RESET, ether_ntoa((const struct ether_addr *)&eptr->ether_shost));
 	fprintf(stdout, CYN " destination: %s " RESET, ether_ntoa((const struct ether_addr *)&eptr->ether_dhost));
 
@@ -183,32 +148,20 @@ void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_cha
 //	fprintf(stdout, "ARP Target IP Address: %s\n"RESET, arphdr->__ar_tip[4]);
 	return;
 }
-// network layer
-void process_arp(const u_char *packet){ 
-	
-	return;
-}
-// transport layer
-void process_udp(const u_char *packet){
-	return;
-}
-void packet_handler(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
-	return;
-}
+
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
+	struct prog_output* our_output = (struct prog_output*)user_data;  // cast the u_char* to the struct for our output info
+
 	static int count = 1;
-	static int max_pkt_len = 0;;
+	static int max_pkt_len = 0;
 	static int min_pkt_len = 1000;
 	static int total_pkt_len = 0;
 	printf("Callback ran: %d\n", count);
 	count++;
-
+	our_output->total_num_pkts = count;
 	
-//	process_ethernet(packet);
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
-	// printf("type%d\n", type);
-	// printf("ntohs%d\n", ntohs(type));
-	//handle_IP(user_data, pkthdr, packet);
+	
 	if (ntohs(type) == ETHERTYPE_IP) {
 		handle_IP(user_data,pkthdr,packet);
 	} else if (ntohs(type) == ETHERTYPE_ARP) {
@@ -227,32 +180,10 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	printf("min packet length: %d\n", min_pkt_len);
 	printf("max packet length: %d\n", max_pkt_len);
 	printf("total length of packets: %d\n", total_pkt_len);
-//	handle_ARP(user_data, pkthdr, packet);
-	// print the start date and time of the packet capture
-
-	// print duration of the packet capture in seconds with microsecond resolution
-
-	// print the total number of packet
-
-	// create 2 lists
-		// 1 for unique senders + total number of packets associated
-		// 1 for unique recipients + total number of packets associated
-	// this should be at Ethernet and IP layers
-		// Ethernet addresses in hex-colon notation
-		// IP addresses in standard dotted decimal notation
-
-	// create a list of machines participating in ARP
-		// associated MAC addresses, any associated IP addresses
-
-	// for udp, create 2 lists for the unique ports seen
-		// 1 for source ports
-		// 1 for destination ports
-
-	// Report the average, minimum, and maximum packet sizes (packet size = everything beyond tcpdump header)
 
 	return;
 }
-
+/**
 int compare_packets(struct pac* pacs, int num_packets, int response) {
 	int maximum = 0;
 	int minimum = pacs[0].length;
@@ -279,3 +210,4 @@ int compare_packets(struct pac* pacs, int num_packets, int response) {
 	}
         return 0;
 }
+*/

@@ -8,6 +8,7 @@ int main (int argc, char *argv[]) {
 		return 1;
 	}
 
+	struct prog_output my_output;
 	const char *filename = argv[1];
 
 	char errbuf[PCAP_ERRBUF_SIZE];
@@ -22,7 +23,7 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "File does not contain Ethernet data\n");
 		return 1;
 	}
-	if (pcap_loop(handle, -1, callback, NULL) < 0) {
+	if (pcap_loop(handle, -1, callback, (u_char*)&my_output) < 0) {
 		fprintf(stderr, "Error reading packets: %s\n", pcap_geterr(handle));
 		return 1;
 	}
