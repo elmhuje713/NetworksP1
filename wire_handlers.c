@@ -132,16 +132,24 @@ void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_cha
 }
 
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
-	struct prog_output* our_output = (struct prog_output*)user_data;  // cast the u_char* to the struct for our output info
-
+//	struct prog_output* our_output = (struct prog_output*)user_data;  // cast the u_char* to the struct for our output info
 	static int count = 1;
 	static int max_pkt_len = 0;
 	static int min_pkt_len = 1000;
 	static int total_pkt_len = 0;
 	printf("Callback ran: %d\n", count);
 	count++;
-	our_output->packet_number = count;
-	our_output->packet_time_info = *pkthdr;
+
+	struct prog_output* our_array = (struct prog_output*)user_data;
+        our_array = (struct prog_output*)realloc(our_array, count * sizeof(struct prog_output));
+
+	user_data = (u_char*)&our_array[count - 1];
+
+	//our_output->packet_number = count;
+	//our_output->packet_time_info = *pkthdr;
+
+	our_array[count - 1].packet_number = count;
+	our_array[count - 1].packet_time_info = *pkthdr;
 
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
 	

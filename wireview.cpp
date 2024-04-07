@@ -10,7 +10,8 @@ int main (int argc, char *argv[]) {
 	}
 
 	wire_analyze analyze;
-	struct prog_output my_output;
+	//struct prog_output my_output;
+	struct prog_output* outputs = (struct prog_output*) malloc(1 * sizeof(struct prog_output*)); 
 	const char *filename = argv[1];
 
 	char errbuf[PCAP_ERRBUF_SIZE];
@@ -25,14 +26,21 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "File does not contain Ethernet data\n");
 		return 1;
 	}
-	if (pcap_loop(handle, -1, callback, (u_char*)&my_output) < 0) {
+	//if (pcap_loop(handle, -1, callback, (u_char*)&my_output) < 0) {
+	if (pcap_loop(handle, -1, callback, (u_char*)&outputs) < 0) {
 		fprintf(stderr, "Error reading packets: %s\n", pcap_geterr(handle));
 		return 1;
 	} else {
-		analyze.setPacket(my_output);
-		analyze.testPrint();
-		printf("My output: %d\n ", my_output.packet_number);
+		//analyze.setPacket(my_output);
+		int length_array = sizeof(outputs) / sizeof(struct prog_output);
+		for (int i = 0; i < length_array; i++) {
+			analyze.setPacket(outputs[i]);
+			analyze.testPrint();
+		//printf("My output: %d\n ", my_output.packet_number);
+			printf("May output: %d\n ", outputs[i].packet_number);
+		}
 	}
+	free(outputs);
 
 	pcap_close(handle);
 
