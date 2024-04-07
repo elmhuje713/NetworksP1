@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pcap.h>
 #include "wire_handlers.h"
+#include "wire_analyze.hpp"
 
 int main (int argc, char *argv[]) {
 	if (argc != 2) {
@@ -8,6 +9,7 @@ int main (int argc, char *argv[]) {
 		return 1;
 	}
 
+	wire_analyze analyze;
 	struct prog_output my_output;
 	const char *filename = argv[1];
 
@@ -26,6 +28,8 @@ int main (int argc, char *argv[]) {
 	if (pcap_loop(handle, -1, callback, (u_char*)&my_output) < 0) {
 		fprintf(stderr, "Error reading packets: %s\n", pcap_geterr(handle));
 		return 1;
+	} else {
+		// analyze.setPacket(my_output);
 	}
 
 	pcap_close(handle);
