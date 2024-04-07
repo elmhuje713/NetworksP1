@@ -29,7 +29,8 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "Error reading packets: %s\n", pcap_geterr(handle));
 		return 1;
 	} else {
-		// analyze.setPacket(my_output);
+		analyze.setPacket(my_output);
+		printf("My output: %d\n ", my_output.packet_number);
 	}
 
 	pcap_close(handle);
