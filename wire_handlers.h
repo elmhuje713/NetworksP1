@@ -65,12 +65,12 @@ struct my_ip {
 extern "C" {
 #endif
 
-void process_ip(const u_char *packet, int packet_len);
+//void process_ip(const u_char *packet, int packet_len);
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
 void udp_print(const struct udphdr *udp_header);
 void tcp_print(const struct tcphdr *tcp_header);
 void ip_print(const struct ip *ip_header);
-void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
+//void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
 
 #ifdef __cplusplus
 }

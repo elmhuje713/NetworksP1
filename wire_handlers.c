@@ -1,12 +1,13 @@
 #include "wire_handlers.h"
 
 u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
+	struct prog_output* our_output = (struct prog_output*)user_data;
 	struct ether_header *eptr; /* net/ethernet.h */
 	eptr = (struct ether_header *) packet;
-
+	our_output->eth_info = *eptr;
 	fprintf(stdout, CYN "ethernet header source %s" RESET, ether_ntoa((const struct ether_addr *)&eptr->ether_shost));
 	fprintf(stdout, CYN " destination: %s " RESET, ether_ntoa((const struct ether_addr *)&eptr->ether_dhost));
-
+	fprintf(stdout, "destination: %s ", ether_ntoa((const struct ether_addr *)&our_output->eth_info.ether_dhost));
 	if (ntohs (eptr->ether_type) == ETHERTYPE_IP) {
 		fprintf(stdout,MAG"(IP)"RESET);
 	} else if (ntohs (eptr->ether_type) == ETHERTYPE_ARP) {
@@ -21,18 +22,23 @@ u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, c
 	return eptr->ether_type;
 }
 // network layer
-void process_ip(const u_char *packet, int packet_len) { 
+void process_ip(u_char *user_data, const u_char *packet, int packet_len) { 
+	struct prog_output* our_output = (struct prog_output*)user_data;
 	struct ether_header *eth_header = (struct ether_header *)packet;
+	
 	if (ntohs(eth_header->ether_type) == ETHERTYPE_IP) {
 		struct ip *ip_header = (struct ip *)(packet + sizeof(struct ether_header));
+		our_output->ip_info = *ip_header;
 		printf(MAG"IP Header:\n"RESET);
 		ip_print(ip_header);
 		if (ip_header->ip_p == IPPROTO_TCP) {
 			struct tcphdr *tcp_header = (struct tcphdr *)(packet + sizeof(struct ether_header) + sizeof(struct ip));
+			our_output->tcp_info = *tcp_header;
 			printf(GRN "TCP Header:\n" RESET);
 			tcp_print(tcp_header);
 		} else if (ip_header->ip_p == IPPROTO_UDP) {
 			struct udphdr *udp_header = (struct udphdr *)(packet + sizeof(struct ether_header) + sizeof(struct ip));
+			our_output->udp_info = *udp_header;
 			printf(BLU "UDP Header:\n" RESET);
 			udp_print(udp_header);
 		}
@@ -72,7 +78,9 @@ void ip_print(const struct ip *ip_header) {
 }
 
 u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
+//	struct prog_output* our_output = (struct prog_output*)user_data;
 	const struct my_ip* ip;
+//	our_output->ip_info = ip;
 	int len;
 	u_int length = pkthdr->len;
 	u_int hlen, off, version;
@@ -85,7 +93,7 @@ u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_c
 	}
 	len = ntohs(ip->ip_len);
 
-	process_ip(packet, length);
+	process_ip(user_data, packet, length);
 
 	hlen = IP_HL(ip);
 	version = IP_V(ip);
@@ -108,8 +116,10 @@ u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_c
 	return NULL;
 }
 void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
+	struct prog_output* our_output = (struct prog_output*)user_data;
 	struct arphdr *arphdr; /* net/if_arp */
         arphdr = (struct arphdr *) packet;
+	our_output->arp_machine_info = *arphdr;
         fprintf(stdout, YEL "ARP Hardware Type: %u\n", arphdr->ar_hrd);
         fprintf(stdout, "ARP Protocol Type: %u\n", arphdr->ar_pro);
 	fprintf(stdout, "ARP Hardware Address Length: %u bytes\n", arphdr->ar_hln);
@@ -131,7 +141,8 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	printf("Callback ran: %d\n", count);
 	count++;
 	our_output->packet_number = count;
-	
+	our_output->packet_time_info = *pkthdr;
+
 	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
 	
 	if (ntohs(type) == ETHERTYPE_IP) {
