@@ -30,6 +30,7 @@ int main (int argc, char *argv[]) {
 		return 1;
 	} else {
 		analyze.setPacket(my_output);
+		analyze.testPrint();
 		printf("My output: %d\n ", my_output.packet_number);
 	}
 

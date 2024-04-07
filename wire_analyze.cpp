@@ -13,6 +13,17 @@ wire_analyze::wire_analyze() {
 void wire_analyze::setPacket(struct prog_output packet) {
 	packetInfo.insert({packetNum++, packet});
 }
+
+void wire_analyze::testPrint() {
+	std::map<int, struct prog_output>::iterator it = packetInfo.begin();
+ 
+    // Iterate through the map and print the elements
+    while (it != packetInfo.end()) {
+        std::cout << "Key: " << it->first
+             << ", Value: " << (it->second).packet_number << std::endl;
+        ++it;
+    }
+}
  
 
 // int main() {
@@ -29,14 +40,14 @@ void wire_analyze::setPacket(struct prog_output packet) {
 
 // 	// Get an iterator pointing to the first element in the
 //     // map
-//     std::map<int, struct prog_output>::iterator it = packetInfo.begin();
+    // std::map<int, struct prog_output>::iterator it = packetInfo.begin();
  
-//     // Iterate through the map and print the elements
-//     while (it != packetInfo.end()) {
-//         std::cout << "Key: " << it->first
-//              << ", Value: " << (it->second).packet_number << std::endl;
-//         ++it;
-//     }
+    // // Iterate through the map and print the elements
+    // while (it != packetInfo.end()) {
+    //     std::cout << "Key: " << it->first
+    //          << ", Value: " << (it->second).packet_number << std::endl;
+    //     ++it;
+    // }
 
 // 	/*
 // 	std::string line;

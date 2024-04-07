@@ -12,5 +12,6 @@ class wire_analyze {
     wire_analyze(void);
     std::map<int, struct prog_output> packetInfo;
     void setPacket(struct prog_output);
+    void testPrint();
 
 };
