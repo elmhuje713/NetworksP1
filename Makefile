@@ -13,4 +13,4 @@ wire_handlers.o: wire_handlers.c wire_handlers.h
 	gcc -c wire_handlers.c
 
 clean:
-	rm -f wireview wireview.o wire_handlers.o wire_analyze wire_analyze.o
+	rm -f wireview wire_analyze *.o
