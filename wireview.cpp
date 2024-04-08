@@ -3,6 +3,8 @@
 #include "wire_handlers.h"
 #include "wire_analyze.hpp"
 
+void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
+
 int main (int argc, char *argv[]) {
 	if (argc != 2) {
 		fprintf(stderr, "Usage: %s <pcap>\n", argv[0]);
@@ -10,7 +12,7 @@ int main (int argc, char *argv[]) {
 	}
 
 	wire_analyze analyze;
-	struct prog_output* outputs[4];
+	struct prog_output output;
 	const char *filename = argv[1];
 	char errbuf[PCAP_ERRBUF_SIZE];
 	pcap_t *handle;
@@ -24,26 +26,53 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "File does not contain Ethernet data\n");
 		return 1;
 	}
-	//if (pcap_loop(handle, -1, callback, (u_char*)&my_output) < 0) {
-	if (pcap_loop(handle, -1, callback, (u_char*)outputs) < 0) {
+	if (pcap_loop(handle, -1, callback, (u_char*)&output) < 0) {
 		fprintf(stderr, "Error reading packets: %s\n", pcap_geterr(handle));
 		return 1;
 	} else {
-		//analyze.setPacket(my_output);
-		//int length_array = sizeof(outputs) / sizeof(struct prog_output);
-		int length_array = 4;
-		for (int i = 0; i < length_array; i++) {
-			
-//			analyze.setPacket(*outputs[i]);
-//			analyze.testPrint();
-			printf("May output: %d\n ", outputs[0]->packet_number);
-		}
-	}
-	for (int i = 0; i < 4; i++) {
-    		free(outputs[i]);
-	}
 
+	}
 	pcap_close(handle);
-
 	return 0;
+}
+
+void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
+        static int count = 0;
+
+	static wire_analyze analyze;
+
+        static int max_pkt_len = 0;
+        static int min_pkt_len = 1000;
+        static int total_pkt_len = 0;
+
+        struct prog_output* our_output = (struct prog_output*)user_data;
+        count++;
+        printf("Callback ran: %d\n", count);
+        our_output->packet_number = count;
+        printf("count: %d\n", our_output->packet_number);
+        our_output->packet_time_info = *pkthdr;
+
+        u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
+        if (ntohs(type) == ETHERTYPE_IP) {
+                handle_IP(user_data,pkthdr,packet);
+        } else if (ntohs(type) == ETHERTYPE_ARP) {
+                handle_ARP(user_data,pkthdr, packet);
+        } else if (type == ETHERTYPE_REVARP) {
+                printf("REV ARP");
+        }
+
+        total_pkt_len += pkthdr->caplen;
+        if (pkthdr->caplen > max_pkt_len) {
+                max_pkt_len = pkthdr->caplen;
+        }
+        if (pkthdr->caplen < min_pkt_len) {
+                min_pkt_len = pkthdr->caplen;
+        }
+        printf("min packet length: %d\n", min_pkt_len);
+        printf("max packet length: %d\n", max_pkt_len);
+        printf("total length of packets: %d\n", total_pkt_len);
+	analyze.setPacket(*our_output);
+        analyze.testPrint();
+        printf("May output: %d\n ", our_output->packet_number);
+        return;
 }
