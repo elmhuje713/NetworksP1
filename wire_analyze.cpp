@@ -25,20 +25,22 @@ void wire_analyze::testPrint() {
     }
 }
 
-void wire_analyze::setEth(struct prog_output packet) {
-	ethInfo.insert({packet->eth_info, count++});
+void wire_analyze::printTime(int indx) {
+    __time_t time = packetInfo.at(indx).packet_time_info.ts.tv_sec;
+    printf("Time: %s", ctime(&time));
 }
 
-void wire_analyze::unique_eths() {
+void wire_analyze::setEth(struct prog_output packet) {
+	ethInfo.insert({packet.eth_info});
+}
+
+void wire_analyze::uniqueEths() {
 	std::map<struct eth_header, int>::iterator c = ethInfo.begin();
 
 	while (c != ethInfo.end()) {
-		std::cout << "Sender: " << c->
-		<< ", 
+		std::cout << "Sender: " << c->ether_shost << std::endl;
+		std::cout << "Recipient: " << c->ether_dhost << std::endl;
 		++c;
-	}
-	while (c != ethInfo.end()) {
-		std::cout << "Recipient: " << c->ether_dhost
 	}
 }
 // int main() {
