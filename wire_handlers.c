@@ -137,17 +137,16 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
     	count++;
     	printf("Callback ran: %d\n", count);
     
-    	if (count > INITIAL_SIZE) {
-       		our_array = realloc(our_array, count * sizeof(struct prog_output));
-        	if (our_array == NULL) {
-            		fprintf(stderr, "Error reallocating memory\n");
-            		exit(1);
-        	}
+    	if (our_array == NULL) {
+        	fprintf(stderr, "Error: Invalid pointer\n");
+        	return;
     	}
-
-
-	//our_output->packet_number = count;
-	//our_output->packet_time_info = *pkthdr;
+    
+    	our_array = realloc(our_array, count * sizeof(struct prog_output));
+    	if (our_array == NULL) {
+        	fprintf(stderr, "Error reallocating memory\n");
+        	exit(1);
+    	}
 
 	our_array[count - 1].packet_number = count;
 	printf("count: %d\n", our_array[count - 1].packet_number);
