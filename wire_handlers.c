@@ -133,17 +133,31 @@ void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_cha
 
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 //	struct prog_output* our_output = (struct prog_output*)user_data;  // cast the u_char* to the struct for our output info
-	static int count = 1;
+	static int count = 0;
+//	static int array_size = 0;
+
 	static int max_pkt_len = 0;
 	static int min_pkt_len = 1000;
 	static int total_pkt_len = 0;
-	printf("Callback ran: %d\n", count);
 	count++;
+	printf("Callback ran: %d\n", count);
 
 	struct prog_output* our_array = (struct prog_output*)user_data;
-        our_array = (struct prog_output*)realloc(our_array, count * sizeof(struct prog_output));
+//	if (count > array_size) {
 
-	user_data = (u_char*)&our_array[count - 1];
+		//array_size = count;
+	        //struct prog_output* temp = (struct prog_output*)realloc(&our_array, array_size * sizeof(struct prog_output));
+		//if (temp == NULL) {
+			//fprintf(stderr, "Error reallocating memory\n");
+			//if (our_array != NULL) {
+			//	free(our_array);
+//			}
+//			exit(1);
+//		}
+//		our_array = temp;
+//	}
+
+//	user_data = (u_char*)&our_array[count - 1];
 
 	//our_output->packet_number = count;
 	//our_output->packet_time_info = *pkthdr;
@@ -151,12 +165,12 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	our_array[count - 1].packet_number = count;
 	our_array[count - 1].packet_time_info = *pkthdr;
 
-	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
+	u_int16_t type = handle_ethernet((u_char*)&our_array[count -1], pkthdr, packet);
 	
 	if (ntohs(type) == ETHERTYPE_IP) {
-		handle_IP(user_data,pkthdr,packet);
+		handle_IP((u_char*)&our_array[count - 1],pkthdr,packet);
 	} else if (ntohs(type) == ETHERTYPE_ARP) {
-		handle_ARP(user_data,pkthdr, packet);
+		handle_ARP((u_char*)&our_array[count - 1],pkthdr, packet);
 	} else if (type == ETHERTYPE_REVARP) {
 		printf("REV ARP");
 	}
