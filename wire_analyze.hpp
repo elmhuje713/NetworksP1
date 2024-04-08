@@ -17,6 +17,6 @@ class wire_analyze {
     void testPrint();
     void printTime(int);
 //    void setEth(struct prog_output packet);
-  //  void uniqueEths();
+    void uniqueEths();
 
 };
