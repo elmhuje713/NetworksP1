@@ -4,6 +4,7 @@
 #include "wire_analyze.hpp"
 
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
+wire_analyze analyze;
 
 int main (int argc, char *argv[]) {
 	if (argc != 2) {
@@ -11,7 +12,7 @@ int main (int argc, char *argv[]) {
 		return 1;
 	}
 
-	wire_analyze analyze;
+	// wire_analyze analyze;
 	struct prog_output output;
 	const char *filename = argv[1];
 	char errbuf[PCAP_ERRBUF_SIZE];
@@ -32,14 +33,16 @@ int main (int argc, char *argv[]) {
 	} else {
 
 	}
+        analyze.testPrint();
+        analyze.printTime(1);
+        printf("aaah%d",analyze.packetInfo.at(4).packet_number);
+
 	pcap_close(handle);
 	return 0;
 }
 
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
         static int count = 0;
-
-	static wire_analyze analyze;
 
         static int max_pkt_len = 0;
         static int min_pkt_len = 1000;
@@ -57,7 +60,7 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
                 handle_IP(user_data,pkthdr,packet);
         } else if (ntohs(type) == ETHERTYPE_ARP) {
                 handle_ARP(user_data,pkthdr, packet);
-        } else if (type == ETHERTYPE_REVARP) {
+        } else if (ntohs(type) == ETHERTYPE_REVARP) {
                 printf("REV ARP");
         }
 
@@ -71,8 +74,7 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
         printf("min packet length: %d\n", min_pkt_len);
         printf("max packet length: %d\n", max_pkt_len);
         printf("total length of packets: %d\n", total_pkt_len);
-	analyze.setPacket(*our_output);
-        analyze.testPrint();
+	analyze.setPacket(*our_output); // Add Packet to map
         printf("May output: %d\n ", our_output->packet_number);
         return;
 }
