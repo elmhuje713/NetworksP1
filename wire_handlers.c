@@ -137,7 +137,7 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
     	count++;
     	printf("Callback ran: %d\n", count);
     
-    	if (count > INITIAL_SIZE) {
+    	if (count > 0 && count < 5) {
        		our_array = realloc(our_array, count * sizeof(struct prog_output));
         	if (our_array == NULL) {
             		fprintf(stderr, "Error reallocating memory\n");
