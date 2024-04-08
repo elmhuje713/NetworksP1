@@ -24,6 +24,11 @@ void wire_analyze::testPrint() {
         ++it;
     }
 }
+
+void wire_analyze::printTime(int indx) {
+    __time_t time = packetInfo.at(indx).packet_time_info.ts.tv_sec;
+    printf("Time: %s", ctime(&time));
+}
  
 
 // int main() {
