@@ -78,9 +78,7 @@ void ip_print(const struct ip *ip_header) {
 }
 
 u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
-//	struct prog_output* our_output = (struct prog_output*)user_data;
 	const struct my_ip* ip;
-//	our_output->ip_info = ip;
 	int len;
 	u_int length = pkthdr->len;
 	u_int hlen, off, version;
@@ -124,40 +122,29 @@ void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_cha
         fprintf(stdout, "ARP Protocol Type: %u\n", arphdr->ar_pro);
 	fprintf(stdout, "ARP Hardware Address Length: %u bytes\n", arphdr->ar_hln);
 	fprintf(stdout, "ARP Protocol Address Length: %u bytes\n"RESET, arphdr->ar_pln);
-//	fprintf(stdout, "ARP Sender Hardware Address: %s\n", arphdr->__ar_sha[ETH_ALEN]);
-//	fprintf(stdout, "ARP Sender IP Address: %s\n", arphdr->__ar_sip[4]);
-//	fprintf(stdout, "ARP Target Hardware Address: %s\n", arphdr->__ar_tha[ETH_ALEN]);
-//	fprintf(stdout, "ARP Target IP Address: %s\n"RESET, arphdr->__ar_tip[4]);
 	return;
 }
 
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
-//	struct prog_output* our_output = (struct prog_output*)user_data;  // cast the u_char* to the struct for our output info
 	static int count = 0;
-//	static int array_size = 0;
 
 	static int max_pkt_len = 0;
 	static int min_pkt_len = 1000;
 	static int total_pkt_len = 0;
-	count++;
-	printf("Callback ran: %d\n", count);
 
-	struct prog_output* our_array = (struct prog_output*)user_data;
-//	if (count > array_size) {
+    	struct prog_output* our_array = (struct prog_output*)user_data;
+    
+    	count++;
+    	printf("Callback ran: %d\n", count);
+    
+    	if (count > INITIAL_SIZE) {
+       		our_array = realloc(our_array, count * sizeof(struct prog_output));
+        	if (our_array == NULL) {
+            		fprintf(stderr, "Error reallocating memory\n");
+            		exit(1);
+        	}
+    	}
 
-		//array_size = count;
-	        //struct prog_output* temp = (struct prog_output*)realloc(&our_array, array_size * sizeof(struct prog_output));
-		//if (temp == NULL) {
-			//fprintf(stderr, "Error reallocating memory\n");
-			//if (our_array != NULL) {
-			//	free(our_array);
-//			}
-//			exit(1);
-//		}
-//		our_array = temp;
-//	}
-
-//	user_data = (u_char*)&our_array[count - 1];
 
 	//our_output->packet_number = count;
 	//our_output->packet_time_info = *pkthdr;
