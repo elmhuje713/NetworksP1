@@ -35,7 +35,7 @@ void wire_analyze::printTime(int indx) {
     // (MM:dd:yyyy hh:mm:ss).uS
     printf("Time: %s.%ld\n", stringEpoch, elapsed);
 }
-
+/**
 void wire_analyze::setEth(struct prog_output packet) {
 	ethInfo.insert({packet.eth_info});
 }
@@ -49,6 +49,7 @@ void wire_analyze::uniqueEths() {
 		++c;
 	}
 }
+*/
 // int main() {
 
 // 	std::map<int, struct prog_output> packetInfo;
