@@ -26,8 +26,14 @@ void wire_analyze::testPrint() {
 }
 
 void wire_analyze::printTime(int indx) {
-    __time_t time = packetInfo.at(indx).packet_time_info.ts.tv_sec;
-    printf("Time: %s", ctime(&time));
+    __time_t timeEpoch = packetInfo.at(indx).packet_time_info.ts.tv_sec;
+    __suseconds_t elapsed = packetInfo.at(indx).packet_time_info.ts.tv_usec;
+    char stringEpoch [80];
+    tm *tm_time = localtime(&timeEpoch);
+    // MM:dd:yyyy hh:mm:ss -> %m:%d:%Y %H:%M:%S
+    strftime(stringEpoch, 80, "%m:%d:%Y %H:%M:%S",tm_time);
+    // (MM:dd:yyyy hh:mm:ss).uS
+    printf("Time: %s.%ld\n", stringEpoch, elapsed);
 }
  
 

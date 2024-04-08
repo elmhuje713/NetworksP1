@@ -36,10 +36,13 @@ int main (int argc, char *argv[]) {
         analyze.testPrint();
         analyze.printTime(1);
         analyze.printTime(2);
+        analyze.printTime(3);
+        analyze.printTime(4);
         // More ranges in arp-storm
         // analyze.printTime(200);
+        // analyze.printTime(300);
         // analyze.printTime(622);
-        printf("aaah%d",analyze.packetInfo.at(4).packet_number);
+        // printf("aaah%d",analyze.packetInfo.at(4).packet_number);
 
 	pcap_close(handle);
 	return 0;
