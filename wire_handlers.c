@@ -163,6 +163,7 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
 	//our_output->packet_time_info = *pkthdr;
 
 	our_array[count - 1].packet_number = count;
+	printf("count: %d\n", our_array[count - 1].packet_number);
 	our_array[count - 1].packet_time_info = *pkthdr;
 
 	u_int16_t type = handle_ethernet((u_char*)&our_array[count -1], pkthdr, packet);
