@@ -17,22 +17,35 @@ void wire_analyze::setPacket(struct prog_output packet) {
 void wire_analyze::printPackets() {
     time_t sec = packetInfo.at(1).packet_time_info.ts.tv_sec;
     suseconds_t usec = packetInfo.at(1).packet_time_info.ts.tv_usec;
+    bpf_u_int32 minPacketSize = 0xffffffff;
+    bpf_u_int32 maxPacketSize = 0;
+    float avgPacketSize = 0;
 
     for (int i = 1; i <= packetInfo.size(); i++) {
+        bpf_u_int32 packetSize = packetInfo.at(i).packet_time_info.len;
         time_t curr_sec = packetInfo.at(i).packet_time_info.ts.tv_sec;
         suseconds_t curr_usec = packetInfo.at(i).packet_time_info.ts.tv_usec;
         time_t elapsed_sec = curr_sec - sec;
         suseconds_t elapsed_usec = curr_usec - usec;
         // If usec is negative, add 1 sec of time to usec
-        if (elapsed_usec <0) {
+        if (elapsed_usec < 0) {
             elapsed_sec--;
             elapsed_usec += 1000000;
         }
-        printf("%d ", i);
-        printTime(i);
-        printf(" %ld.%06ld", elapsed_sec, elapsed_usec);
-        printf(" %d\n", packetInfo.at(i).packet_time_info.len);
+        // Set Min, Max, and Average packet sizes
+        if (packetSize < minPacketSize) minPacketSize = packetSize;
+        if (packetSize > maxPacketSize) maxPacketSize = packetSize;
+        avgPacketSize += packetSize;
+
+        printf("%d ", i); // Packet Num
+        printTime(i); // Epoch Time
+        printf(" %ld.%06ld", elapsed_sec, elapsed_usec); // Elapsed Time
+        printf(" %d\n", packetSize); // Packet Size
     }
+    avgPacketSize /= packetInfo.size();
+    printf("Total of %ld packets found\n", packetInfo.size());
+    printf("Statistics -> MIN: %d MAX: %d AVERAGE: %f\n", minPacketSize, maxPacketSize, avgPacketSize);
+
 }
 
 void wire_analyze::testPrint() {
