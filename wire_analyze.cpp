@@ -18,7 +18,7 @@ void wire_analyze::printPackets() {
     time_t sec = packetInfo.at(1).packet_time_info.ts.tv_sec;
     suseconds_t usec = packetInfo.at(1).packet_time_info.ts.tv_usec;
 
-    for (int i = 1; i < packetInfo.size()+1; i++) {
+    for (int i = 1; i <= packetInfo.size(); i++) {
         time_t curr_sec = packetInfo.at(i).packet_time_info.ts.tv_sec;
         suseconds_t curr_usec = packetInfo.at(i).packet_time_info.ts.tv_usec;
         time_t elapsed_sec = curr_sec - sec;
@@ -54,7 +54,7 @@ void wire_analyze::printTime(int indx) {
     // MM:dd:yyyy hh:mm:ss -> %m:%d:%Y %H:%M:%S
     strftime(stringEpoch, 80, "%m:%d:%Y %H:%M:%S",tm_time);
     // (MM:dd:yyyy hh:mm:ss).uS
-    printf("%s.%ld", stringEpoch, elapsed);
+    printf("%s.%06ld", stringEpoch, elapsed);
 }
 /**
 void wire_analyze::setEth(struct prog_output packet) {
