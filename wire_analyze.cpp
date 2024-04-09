@@ -56,8 +56,21 @@ void wire_analyze::printTime(int indx) {
     // (MM:dd:yyyy hh:mm:ss).uS
     printf("%s.%ld", stringEpoch, elapsed);
 }
- 
+/**
+void wire_analyze::setEth(struct prog_output packet) {
+	ethInfo.insert({packet.eth_info});
+}
 
+void wire_analyze::uniqueEths() {
+	std::map<struct eth_header, int>::iterator c = ethInfo.begin();
+
+	while (c != ethInfo.end()) {
+		std::cout << "Sender: " << c->ether_shost << std::endl;
+		std::cout << "Recipient: " << c->ether_dhost << std::endl;
+		++c;
+	}
+}
+*/
 // int main() {
 
 // 	std::map<int, struct prog_output> packetInfo;
