@@ -14,5 +14,6 @@ class wire_analyze {
     void setPacket(struct prog_output);
     void testPrint();
     void printTime(int);
+    void printPackets(void);
 
 };

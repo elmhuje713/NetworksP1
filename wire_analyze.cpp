@@ -14,6 +14,27 @@ void wire_analyze::setPacket(struct prog_output packet) {
 	packetInfo.insert({packetNum++, packet});
 }
 
+void wire_analyze::printPackets() {
+    time_t sec = packetInfo.at(1).packet_time_info.ts.tv_sec;
+    suseconds_t usec = packetInfo.at(1).packet_time_info.ts.tv_usec;
+
+    for (int i = 1; i < packetInfo.size()+1; i++) {
+        time_t curr_sec = packetInfo.at(i).packet_time_info.ts.tv_sec;
+        suseconds_t curr_usec = packetInfo.at(i).packet_time_info.ts.tv_usec;
+        time_t elapsed_sec = curr_sec - sec;
+        suseconds_t elapsed_usec = curr_usec - usec;
+        // If usec is negative, add 1 sec of time to usec
+        if (elapsed_usec <0) {
+            elapsed_sec--;
+            elapsed_usec += 1000000;
+        }
+        printf("%d ", i);
+        printTime(i);
+        printf(" %ld.%06ld", elapsed_sec, elapsed_usec);
+        printf(" %d\n", packetInfo.at(i).packet_time_info.len);
+    }
+}
+
 void wire_analyze::testPrint() {
 	std::map<int, struct prog_output>::iterator it = packetInfo.begin();
  
@@ -33,7 +54,7 @@ void wire_analyze::printTime(int indx) {
     // MM:dd:yyyy hh:mm:ss -> %m:%d:%Y %H:%M:%S
     strftime(stringEpoch, 80, "%m:%d:%Y %H:%M:%S",tm_time);
     // (MM:dd:yyyy hh:mm:ss).uS
-    printf("Time: %s.%ld\n", stringEpoch, elapsed);
+    printf("%s.%ld", stringEpoch, elapsed);
 }
  
 
