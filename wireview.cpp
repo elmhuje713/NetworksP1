@@ -44,6 +44,10 @@ int main (int argc, char *argv[]) {
         // analyze.printTime(300);
         // analyze.printTime(622);
         // printf("aaah%d",analyze.packetInfo.at(4).packet_number);
+	analyze.uniqueEths(1);
+	analyze.uniqueEths(2);
+	analyze.uniqueEths(3);
+	analyze.uniqueEths(4);
 
 	pcap_close(handle);
 	return 0;

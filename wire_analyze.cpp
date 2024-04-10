@@ -56,16 +56,14 @@ void wire_analyze::printTime(int indx) {
     // (MM:dd:yyyy hh:mm:ss).uS
     printf("%s.%06ld", stringEpoch, elapsed);
 }
-/**
+
 void wire_analyze::uniqueEths(int indx) {
-    struct ether_addr sender = packetInfo.at(indx).eth_info.ether_shost;
-    struct ether_addr receiver = packetInfo.at(indx).eth_info.ether_dhost;
-    char sender_str[ETHER_ADDRSTRLEN];
-    char receiver_str[ETHER_ADDRSTRLEN];
-    printf("ethernet header source %s", ether_ntoa_r(&sender, sender_str));
-    printf("ethernet header destination %s", ether_ntoa_r(&receiver, receiver_str));
+    uint8_t* sender = packetInfo.at(indx).eth_info.ether_shost;
+    uint8_t* receiver = packetInfo.at(indx).eth_info.ether_dhost;
+    printf("ethernet header source %s\n", ether_ntoa((const struct ether_addr *)sender));
+    printf("ethernet header destination %s\n", ether_ntoa((const struct ether_addr *)receiver));
 }
-*/
+
 // int main() {
 
 // 	std::map<int, struct prog_output> packetInfo;

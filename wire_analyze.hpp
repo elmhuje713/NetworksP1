@@ -15,6 +15,6 @@ class wire_analyze {
     void testPrint();
     void printTime(int);
     void printPackets(void);
-    //void uniqueEths(int);
+    void uniqueEths(int);
 
 };
