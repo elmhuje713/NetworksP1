@@ -73,8 +73,40 @@ void wire_analyze::printTime(int indx) {
 void wire_analyze::uniqueEths(int indx) {
     uint8_t* sender = packetInfo.at(indx).eth_info.ether_shost;
     uint8_t* receiver = packetInfo.at(indx).eth_info.ether_dhost;
-    printf("ethernet header source %s\n", ether_ntoa((const struct ether_addr *)sender));
+    printf("eth source %s\n", ether_ntoa((const struct ether_addr *)sender));
     printf("ethernet header destination %s\n", ether_ntoa((const struct ether_addr *)receiver));
+}
+
+void wire_analyze::mapEth() {
+   for (int i = 1; i <= packetInfo.size(); i++) {
+	std::string senderKey = ether_ntoa((const struct ether_addr*)packetInfo.at(i).eth_info.ether_shost);
+	std::string receiverKey = ether_ntoa((const struct ether_addr*)packetInfo.at(i).eth_info.ether_dhost);
+	//std::cout << senderKey << std::endl;
+	if(senderMap.find(senderKey) != senderMap.end()) { 
+	    senderMap[senderKey]++;
+	   // std::cout << "incremented" << std::endl;
+	} else {
+	    senderMap.insert({senderKey, 1});
+	    //std::cout << "inserted" << std::endl;
+	}
+
+	if(receiverMap.find(receiverKey) != receiverMap.end()) {
+	    receiverMap[receiverKey]++;
+	} else {
+	    receiverMap.insert({receiverKey, 1});
+	}
+   }
+   std::map<std::string, int>::iterator it = senderMap.begin();
+   while (it != senderMap.end()) {
+	std::cout << "src eth addr " << it->first << " in " << it->second << " packets" << std::endl;
+	++it;
+   }
+   std::map<std::string, int>::iterator itr = receiverMap.begin();
+   while (itr != receiverMap.end()) {
+	std::cout << "dest eth addr " << itr->first << " in " << itr->second << " packets" << std::endl;
+	++itr;
+   }
+
 }
 
 // int main() {
