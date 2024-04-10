@@ -15,6 +15,8 @@ class wire_analyze {
     std::map<std::string, int> eth_receiverMap;
     std::map<std::string, int> ip_senderMap;
     std::map<std::string, int> ip_receiverMap;
+    std::map<uint16_t, int> udp_senderMap;
+    std::map<uint16_t, int> udp_receiverMap;
     void setPacket(struct prog_output);
     void testPrint();
     void printTime(int);
@@ -23,4 +25,6 @@ class wire_analyze {
     void mapEth();
     void uniqueIPs(int);
     void mapIP();
+    void uniqueUDPports(int);
+    void mapUDPports();
 };

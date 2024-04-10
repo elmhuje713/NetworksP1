@@ -50,6 +50,11 @@ int main (int argc, char *argv[]) {
 	//analyze.uniqueEths(4);
 	analyze.mapEth();
 	analyze.mapIP();
+	analyze.mapUDPports();
+	//analyze.uniqueUDPports(1);
+	//analyze.uniqueUDPports(2);
+	//analyze.uniqueUDPports(3);
+	//analyze.uniqueUDPports(4);
 	//analyze.uniqueIPs(1);
 	//analyze.uniqueIPs(2);
 	//analyze.uniqueIPs(3);

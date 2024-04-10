@@ -84,6 +84,40 @@ void wire_analyze::uniqueIPs(int indx) {
     printf("ip dest   %s\n", inet_ntoa(receiver));
 }
 
+void wire_analyze::uniqueUDPports(int indx) {
+   uint16_t sender = packetInfo.at(indx).udp_info.source;
+   uint16_t receiver = packetInfo.at(indx).udp_info.dest;
+   printf("udp src port %u\n", ntohs(sender));
+   printf("udp dest port %u\n", ntohs(receiver));
+}
+
+void wire_analyze::mapUDPports() {
+   for (int i = 1; i <= packetInfo.size(); i++ ) {
+        uint16_t senderKey = ntohs(packetInfo.at(i).udp_info.source);
+	uint16_t receiverKey = ntohs(packetInfo.at(i).udp_info.dest);      
+	if (udp_senderMap.find(senderKey) != udp_senderMap.end()) {
+	    udp_senderMap[senderKey]++;
+	} else {
+	    udp_senderMap.insert({senderKey, 1});
+	}
+	if (udp_receiverMap.find(receiverKey) != udp_receiverMap.end()) {
+	    udp_receiverMap[receiverKey]++;
+	} else {
+	    udp_receiverMap.insert({receiverKey, 1});
+	}
+   }	   
+   std::map<uint16_t, int>::iterator it = udp_senderMap.begin();
+   while (it != udp_senderMap.end()) {
+	std::cout << "src udp port " << it->first << " in " << it->second << " packets" << std::endl;
+	++it;
+   }
+   std::map<uint16_t, int>::iterator itr = udp_receiverMap.begin();
+   while (itr != udp_receiverMap.end()) {
+        std::cout << "dest udp port " << itr->first << " in " << itr->second << " packets" << std::endl;      
+      	++itr;
+   }
+}
+
 void wire_analyze::mapIP() {
    for (int i = 1; i <= packetInfo.size(); i++) {
 	std::string senderKey = inet_ntoa(packetInfo.at(i).ip_info.ip_src);
@@ -93,7 +127,6 @@ void wire_analyze::mapIP() {
 	} else {
 	   ip_senderMap.insert({senderKey, 1});
 	}
-
 	if(ip_receiverMap.find(receiverKey) != eth_receiverMap.end()) {
 	   ip_receiverMap[receiverKey]++;
 	} else {
