@@ -49,6 +49,11 @@ int main (int argc, char *argv[]) {
 	//analyze.uniqueEths(3);
 	//analyze.uniqueEths(4);
 	analyze.mapEth();
+	analyze.mapIP();
+	//analyze.uniqueIPs(1);
+	//analyze.uniqueIPs(2);
+	//analyze.uniqueIPs(3);
+	//analyze.uniqueIPs(4);
 	pcap_close(handle);
 	return 0;
 }

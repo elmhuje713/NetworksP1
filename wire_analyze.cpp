@@ -77,32 +77,63 @@ void wire_analyze::uniqueEths(int indx) {
     printf("ethernet header destination %s\n", ether_ntoa((const struct ether_addr *)receiver));
 }
 
+void wire_analyze::uniqueIPs(int indx) {
+    struct in_addr sender = packetInfo.at(indx).ip_info.ip_src;
+    struct in_addr receiver = packetInfo.at(indx).ip_info.ip_dst;
+    printf("ip source %s\n", inet_ntoa(sender));
+    printf("ip dest   %s\n", inet_ntoa(receiver));
+}
+
+void wire_analyze::mapIP() {
+   for (int i = 1; i <= packetInfo.size(); i++) {
+	std::string senderKey = inet_ntoa(packetInfo.at(i).ip_info.ip_src);
+	std::string receiverKey = inet_ntoa(packetInfo.at(i).ip_info.ip_dst);
+        if(ip_senderMap.find(senderKey) != ip_senderMap.end()) {
+	   ip_senderMap[senderKey]++;
+	} else {
+	   ip_senderMap.insert({senderKey, 1});
+	}
+
+	if(ip_receiverMap.find(receiverKey) != eth_receiverMap.end()) {
+	   ip_receiverMap[receiverKey]++;
+	} else {
+	   ip_receiverMap.insert({receiverKey, 1});
+	}
+   }	
+   std::map<std::string, int>::iterator it = ip_senderMap.begin();
+   while (it != ip_senderMap.end()) {
+      std::cout << "src ip addr " << it->first << " in " << it->second << " packets" << std::endl;
+      ++it;
+   }
+   std::map<std::string, int>::iterator itr = ip_receiverMap.begin();
+   while (itr != ip_receiverMap.end()) {
+      std::cout << "dest ip addr " << itr->first << " in " << itr->second << " packets" << std::endl;
+      ++itr;
+   }	   
+}
+
 void wire_analyze::mapEth() {
    for (int i = 1; i <= packetInfo.size(); i++) {
 	std::string senderKey = ether_ntoa((const struct ether_addr*)packetInfo.at(i).eth_info.ether_shost);
 	std::string receiverKey = ether_ntoa((const struct ether_addr*)packetInfo.at(i).eth_info.ether_dhost);
-	//std::cout << senderKey << std::endl;
-	if(senderMap.find(senderKey) != senderMap.end()) { 
-	    senderMap[senderKey]++;
-	   // std::cout << "incremented" << std::endl;
+	if(eth_senderMap.find(senderKey) != eth_senderMap.end()) { 
+	    eth_senderMap[senderKey]++;
 	} else {
-	    senderMap.insert({senderKey, 1});
-	    //std::cout << "inserted" << std::endl;
+	    eth_senderMap.insert({senderKey, 1});
 	}
-
-	if(receiverMap.find(receiverKey) != receiverMap.end()) {
-	    receiverMap[receiverKey]++;
+	if(eth_receiverMap.find(receiverKey) != eth_receiverMap.end()) {
+	    eth_receiverMap[receiverKey]++;
 	} else {
-	    receiverMap.insert({receiverKey, 1});
+	    eth_receiverMap.insert({receiverKey, 1});
 	}
    }
-   std::map<std::string, int>::iterator it = senderMap.begin();
-   while (it != senderMap.end()) {
+   std::map<std::string, int>::iterator it = eth_senderMap.begin();
+   while (it != eth_senderMap.end()) {
 	std::cout << "src eth addr " << it->first << " in " << it->second << " packets" << std::endl;
 	++it;
    }
-   std::map<std::string, int>::iterator itr = receiverMap.begin();
-   while (itr != receiverMap.end()) {
+   std::map<std::string, int>::iterator itr = eth_receiverMap.begin();
+   while (itr != eth_receiverMap.end()) {
 	std::cout << "dest eth addr " << itr->first << " in " << itr->second << " packets" << std::endl;
 	++itr;
    }
