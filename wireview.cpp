@@ -37,7 +37,7 @@ int main (int argc, char *argv[]) {
 	analyze.mapEth();
 	analyze.mapIP();
 	analyze.mapUDPports();
-        analyze.printARP();
+        analyze.listARP();
 	pcap_close(handle);
 	return 0;
 }

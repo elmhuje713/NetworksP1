@@ -30,5 +30,6 @@ class wire_analyze {
     void mapIP();
     void uniqueUDPports(int);
     void mapUDPports();
-    void printARP(void);
+    void listARP(void);
+    void printARP(prog_output machine);
 };

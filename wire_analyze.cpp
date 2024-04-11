@@ -14,6 +14,10 @@ void wire_analyze::setPacket(struct prog_output packet) {
 	packetInfo.insert({packetNum++, packet});
 }
 
+/**
+ * Prints all the packets in the pcap file
+ * [packetNum] TODO: finish
+*/
 void wire_analyze::printPackets() {
     time_t sec = packetInfo.at(1).packet_time_info.ts.tv_sec;
     suseconds_t usec = packetInfo.at(1).packet_time_info.ts.tv_usec;
@@ -59,6 +63,10 @@ void wire_analyze::testPrint() {
     }
 }
 
+/**
+ * Prints the EPOCH time for a set packet
+ * @param indx packetNum for what packet to print
+*/
 void wire_analyze::printTime(int indx) {
     __time_t timeEpoch = packetInfo.at(indx).packet_time_info.ts.tv_sec;
     __suseconds_t elapsed = packetInfo.at(indx).packet_time_info.ts.tv_usec;
@@ -70,35 +78,42 @@ void wire_analyze::printTime(int indx) {
     printf("%s.%06ld", stringEpoch, elapsed);
 }
 
-// TODO: Why is this off by one? (Last packet is gone I think)
-void wire_analyze::printARP() {
-
+/**
+ * 
+*/
+void wire_analyze::listARP() {
     // Write ARP machines to a list
     for (int i = 1; i <= packetInfo.size(); i++) {
         if (ntohs(packetInfo.at(i).eth_info.ether_type) == ETHERTYPE_ARP) {
             ARP_machines.push_front(packetInfo.at(i));
         }
     }
-
     printf("List of ARP Machines:\n");
     std::list<prog_output>::iterator it = ARP_machines.end();
     while (it != ARP_machines.begin()) {
         prog_output machine = *it;
-        uint8_t* MAC_source = machine.arp_machine_info.arp_sha;
-        uint8_t* MAC_destination = machine.arp_machine_info.arp_tha;
-        uint8_t* IP_source = machine.arp_machine_info.arp_spa;
-        uint8_t* IP_destination = machine.arp_machine_info.arp_tpa;
-        printf("MAC Source: %s | ", ether_ntoa((const struct ether_addr *)MAC_source));
-        printf("MAC Destination: %s\n", ether_ntoa((const struct ether_addr *)MAC_destination));
-        printf("IP Source Address: %s | ", inet_ntoa(*(struct in_addr *)IP_source));
-	    printf("IP Destination Address: %s\n", inet_ntoa(*(const struct in_addr *)IP_destination));
-        printf("ARP Hardware Type: %u\n", machine.arp_machine_info.ea_hdr.ar_hrd);
-        printf("ARP Protocol Type: %u\n", machine.arp_machine_info.ea_hdr.ar_pro);
-        printf("ARP Hardware Address Length: %u\n", machine.arp_machine_info.ea_hdr.ar_hln);
-        printf("ARP Protocol Address Length: %u\n", machine.arp_machine_info.ea_hdr.ar_pln);
-        printf("ARP Protocol: %d\n", ntohs(machine.arp_machine_info.ea_hdr.ar_op));
+        printARP(machine);
         --it;
-    }    
+    }
+    prog_output machine = *it;
+    if (ARP_machines.size()) printARP(machine);
+    else printf("[NONE FOUND]\n");
+}
+
+void wire_analyze::printARP(prog_output machine) {
+    uint8_t* MAC_source = machine.arp_machine_info.arp_sha;
+    uint8_t* MAC_destination = machine.arp_machine_info.arp_tha;
+    uint8_t* IP_source = machine.arp_machine_info.arp_spa;
+    uint8_t* IP_destination = machine.arp_machine_info.arp_tpa;
+    printf("MAC Source: %s | ", ether_ntoa((const struct ether_addr *)MAC_source));
+    printf("MAC Destination: %s\n", ether_ntoa((const struct ether_addr *)MAC_destination));
+    printf("IP Source Address: %s | ", inet_ntoa(*(struct in_addr *)IP_source));
+    printf("IP Destination Address: %s\n", inet_ntoa(*(const struct in_addr *)IP_destination));
+    printf("ARP Hardware Type: %u\n", machine.arp_machine_info.ea_hdr.ar_hrd);
+    printf("ARP Protocol Type: %u\n", machine.arp_machine_info.ea_hdr.ar_pro);
+    printf("ARP Hardware Address Length: %u\n", machine.arp_machine_info.ea_hdr.ar_hln);
+    printf("ARP Protocol Address Length: %u\n", machine.arp_machine_info.ea_hdr.ar_pln);
+    printf("ARP Protocol: %d\n", ntohs(machine.arp_machine_info.ea_hdr.ar_op));
 }
 
 void wire_analyze::uniqueEths(int indx) {
