@@ -22,14 +22,6 @@
 
 #include <string.h>
 
-#define BLU "\x1B[34m"
-#define CYN "\x1B[36m"
-#define GRN "\x1B[32m"
-#define YEL "\x1B[33m"
-#define WHT "\x1B[37m"
-#define MAG "\x1B[35m"
-#define RESET "\x1B[0m"
-
 struct prog_output {
 	int packet_number;
 
@@ -65,9 +57,6 @@ struct my_ip {
 extern "C" {
 #endif
 
-void udp_print(const struct udphdr *udp_header);
-void tcp_print(const struct tcphdr *tcp_header);
-void ip_print(const struct ip *ip_header);
 void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet);
 void process_ip(u_char *user_data, const u_char *packet, int packet_len);
 u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet);

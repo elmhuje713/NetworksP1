@@ -33,49 +33,24 @@ int main (int argc, char *argv[]) {
 	} else {
 
 	}
-        // analyze.testPrint();
         analyze.printPackets();
-        // analyze.printTime(1);
-        // analyze.printTime(2);
-        // analyze.printTime(3);
-        // analyze.printTime(4);
-        // More ranges in arp-storm
-        // analyze.printTime(200);
-        // analyze.printTime(300);
-        // analyze.printTime(622);
-        // printf("aaah%d",analyze.packetInfo.at(4).packet_number);
-	//analyze.uniqueEths(1);
-	//analyze.uniqueEths(2);
-	//analyze.uniqueEths(3);
-	//analyze.uniqueEths(4);
 	analyze.mapEth();
 	analyze.mapIP();
 	analyze.mapUDPports();
         analyze.printARP();
-	//analyze.uniqueUDPports(1);
-	//analyze.uniqueUDPports(2);
-	//analyze.uniqueUDPports(3);
-	//analyze.uniqueUDPports(4);
-	//analyze.uniqueIPs(1);
-	//analyze.uniqueIPs(2);
-	//analyze.uniqueIPs(3);
-	//analyze.uniqueIPs(4);
 	pcap_close(handle);
 	return 0;
 }
 
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
         static int count = 0;
-
         static int max_pkt_len = 0;
         static int min_pkt_len = 1000;
         static int total_pkt_len = 0;
 
         struct prog_output* our_output = (struct prog_output*)user_data;
         count++;
-        printf("Callback ran: %d\n", count);
         our_output->packet_number = count;
-        printf("count: %d\n", our_output->packet_number);
         our_output->packet_time_info = *pkthdr;
 
         u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
@@ -83,8 +58,6 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
                 handle_IP(user_data,pkthdr,packet);
         } else if (ntohs(type) == ETHERTYPE_ARP) {
                 handle_ARP(user_data,pkthdr, packet);
-        } else if (ntohs(type) == ETHERTYPE_REVARP) {
-                printf("REV ARP");
         }
 
         total_pkt_len += pkthdr->caplen;
@@ -94,10 +67,6 @@ void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char 
         if (pkthdr->caplen < min_pkt_len) {
                 min_pkt_len = pkthdr->caplen;
         }
-        printf("min packet length: %d\n", min_pkt_len);
-        printf("max packet length: %d\n", max_pkt_len);
-        printf("total length of packets: %d\n", total_pkt_len);
 	analyze.setPacket(*our_output); // Add Packet to map
-        printf("May output: %d\n ", our_output->packet_number);
         return;
 }
