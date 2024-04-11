@@ -113,14 +113,39 @@ u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_c
 	}
 	return NULL;
 }
+
 void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 	struct prog_output* our_output = (struct prog_output*)user_data;
-	struct arphdr *arphdr; /* net/if_arp */
-        arphdr = (struct arphdr *) packet;
-	our_output->arp_machine_info = *arphdr;
-        fprintf(stdout, YEL "ARP Hardware Type: %u\n", arphdr->ar_hrd);
-        fprintf(stdout, "ARP Protocol Type: %u\n", arphdr->ar_pro);
-	fprintf(stdout, "ARP Hardware Address Length: %u bytes\n", arphdr->ar_hln);
-	fprintf(stdout, "ARP Protocol Address Length: %u bytes\n"RESET, arphdr->ar_pln);
-	return;
+	
+	// Add ether_header length to get to arp_packet
+	struct ether_arp* arp = (struct ether_arp *) (packet + sizeof(struct ether_header));
+	our_output->arp_machine_info = *arp;
+
+	// Print ARP fields
+	uint8_t* MAC_source = arp->arp_sha;
+	uint8_t* MAC_destination = arp->arp_tha;
+	uint8_t* IP_source = arp->arp_spa;
+	uint8_t* IP_destination = arp->arp_tpa;
+	printf("MAC Source: %s | ", ether_ntoa((const struct ether_addr *)MAC_source));
+	printf("MAC Destination: %s\n", ether_ntoa((const struct ether_addr *)MAC_destination));
+	printf("IP Source Address: %s | ", inet_ntoa(*(struct in_addr *)IP_source));
+	printf("IP Destination Address: %s\n", inet_ntoa(*(const struct in_addr *)IP_destination));
+	printf("Hardware Address Format: %d\n", ntohs(arp->arp_hrd));
+	printf("Protocol Type: %d\n", ntohs(arp->arp_pro));
+	printf("Hardware Address Size: %d\n", arp->arp_hln);
+	printf("Protocol Size: %d\n", arp->arp_pln);
+	printf("Opcode: %d\n", ntohs(arp->arp_op));
 }
+
+// void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
+// 	struct prog_output* our_output = (struct prog_output*)user_data;
+// 	struct arphdr *arphdr; /* net/if_arp */
+// 	arphdr = (struct arphdr *) packet+14;
+// 	our_output->arp_machine_info = *arphdr;
+	
+// 	fprintf(stdout, YEL "ARP Hardware Type: %u\n", arphdr->ar_hrd);
+// 	fprintf(stdout, "ARP Protocol Type: %u\n", arphdr->ar_pro);
+// 	fprintf(stdout, "ARP Hardware Address Length: %u bytes\n", arphdr->ar_hln);
+// 	fprintf(stdout, "ARP Protocol Address Length: %u bytes\n"RESET, arphdr->ar_pln);
+// 	return;
+// }

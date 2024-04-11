@@ -38,7 +38,7 @@ struct prog_output {
 	struct ether_header eth_info;
 	struct ip ip_info;
 
-	struct arphdr arp_machine_info;
+	struct ether_arp arp_machine_info;
 
 	struct udphdr udp_info;
 	struct tcphdr tcp_info;

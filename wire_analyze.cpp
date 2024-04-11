@@ -70,6 +70,37 @@ void wire_analyze::printTime(int indx) {
     printf("%s.%06ld", stringEpoch, elapsed);
 }
 
+// TODO: Why is this off by one? (Last packet is gone I think)
+void wire_analyze::printARP() {
+
+    // Write ARP machines to a list
+    for (int i = 1; i <= packetInfo.size(); i++) {
+        if (ntohs(packetInfo.at(i).eth_info.ether_type) == ETHERTYPE_ARP) {
+            ARP_machines.push_front(packetInfo.at(i));
+        }
+    }
+
+    printf("List of ARP Machines:\n");
+    std::list<prog_output>::iterator it = ARP_machines.end();
+    while (it != ARP_machines.begin()) {
+        prog_output machine = *it;
+        uint8_t* MAC_source = machine.arp_machine_info.arp_sha;
+        uint8_t* MAC_destination = machine.arp_machine_info.arp_tha;
+        uint8_t* IP_source = machine.arp_machine_info.arp_spa;
+        uint8_t* IP_destination = machine.arp_machine_info.arp_tpa;
+        printf("MAC Source: %s | ", ether_ntoa((const struct ether_addr *)MAC_source));
+        printf("MAC Destination: %s\n", ether_ntoa((const struct ether_addr *)MAC_destination));
+        printf("IP Source Address: %s | ", inet_ntoa(*(struct in_addr *)IP_source));
+	    printf("IP Destination Address: %s\n", inet_ntoa(*(const struct in_addr *)IP_destination));
+        printf("ARP Hardware Type: %u\n", machine.arp_machine_info.ea_hdr.ar_hrd);
+        printf("ARP Protocol Type: %u\n", machine.arp_machine_info.ea_hdr.ar_pro);
+        printf("ARP Hardware Address Length: %u\n", machine.arp_machine_info.ea_hdr.ar_hln);
+        printf("ARP Protocol Address Length: %u\n", machine.arp_machine_info.ea_hdr.ar_pln);
+        printf("ARP Protocol: %d\n", ntohs(machine.arp_machine_info.ea_hdr.ar_op));
+        --it;
+    }    
+}
+
 void wire_analyze::uniqueEths(int indx) {
     uint8_t* sender = packetInfo.at(indx).eth_info.ether_shost;
     uint8_t* receiver = packetInfo.at(indx).eth_info.ether_dhost;

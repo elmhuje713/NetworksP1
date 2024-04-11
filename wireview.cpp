@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
 	} else {
 
 	}
-        analyze.testPrint();
+        // analyze.testPrint();
         analyze.printPackets();
         // analyze.printTime(1);
         // analyze.printTime(2);
@@ -51,6 +51,7 @@ int main (int argc, char *argv[]) {
 	analyze.mapEth();
 	analyze.mapIP();
 	analyze.mapUDPports();
+        analyze.printARP();
 	//analyze.uniqueUDPports(1);
 	//analyze.uniqueUDPports(2);
 	//analyze.uniqueUDPports(3);
