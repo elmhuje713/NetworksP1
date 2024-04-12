@@ -1,8 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-// #include <map>
-// #include "wire_handlers.h"
 #include "wire_analyze.hpp"
 
 
@@ -10,11 +8,10 @@ wire_analyze::wire_analyze() {
 
 }
 /** setPacket
- * grabs each packet during the execution of callback
+ * Grabs each packet during the execution of callback
  * maps the packet and its callback index
  *
- * param: packet, the packet data
- * return: NULL
+ * @param: packet, the packet data
  */
 void wire_analyze::setPacket(struct prog_output packet) {
 	packetInfo.insert({packetNum++, packet});
@@ -22,7 +19,7 @@ void wire_analyze::setPacket(struct prog_output packet) {
 
 /**
  * Prints all the packets in the pcap file
- * [packetNum] TODO: finish
+ * [packetNum] [MM:dd:yyyy hh:mm:ss.uS] [duration] [packetSize]
 */
 void wire_analyze::printPackets() {
     time_t sec = packetInfo.at(1).packet_time_info.ts.tv_sec;
@@ -60,8 +57,8 @@ void wire_analyze::printPackets() {
 /** testPrint
  * test function to make sure packets were correctly mapped
  *
- * param: none
- * return: NULL
+ * @param: none
+ * @return: NULL
  */
 void wire_analyze::testPrint() {
 	std::map<int, struct prog_output>::iterator it = packetInfo.begin();
@@ -90,10 +87,10 @@ void wire_analyze::printTime(int indx) {
 }
 
 /** listARP
- * accesses and prints all ARP machine information contained within the packet_info struct map
+ * Accesses and prints all ARP machine information contained within the packet_info struct map
  *
- * param: none
- * return: NULL
+ * @param: none
+ * @return: NULL
  */
 void wire_analyze::listARP() {
     // Write ARP machines to a list
@@ -115,10 +112,9 @@ void wire_analyze::listARP() {
 }
 
 /** printARP
- * formats and prints the relevant ARP data
+ * Formats and prints the relevant ARP data
  *
- * param: struct prog_output machine
- * return: NULL
+ * @param: struct prog_output machine
  */
 void wire_analyze::printARP(prog_output machine) {
     uint8_t* MAC_source = machine.arp_machine_info.arp_sha;
@@ -138,8 +134,8 @@ void wire_analyze::printARP(prog_output machine) {
 /** uniqueEths
  * casts, formats and prints the src and dest eth addresses for a given packet
  *
- * param: int indx, an index for the packet for testing purposes
- * return: NULL
+ * @param: int indx, an index for the packet for testing purposes
+ * @return: NULL
  */
 void wire_analyze::uniqueEths(int indx) {
     uint8_t* sender = packetInfo.at(indx).eth_info.ether_shost;
@@ -150,8 +146,8 @@ void wire_analyze::uniqueEths(int indx) {
 /** uniqueIPs
  * casts, formats and prints the src and dest IP addresses for a given packet
  *
- * param: int indx, an index for the packet for testing purposes
- * return: NULL
+ * @param: int indx, an index for the packet for testing purposes
+ * @return: NULL
  */
 void wire_analyze::uniqueIPs(int indx) {
     struct in_addr sender = packetInfo.at(indx).ip_info.ip_src;
@@ -162,7 +158,7 @@ void wire_analyze::uniqueIPs(int indx) {
 /** uniqueEths
  * casts, formats and prints the src and dest udp ports for a given packet
  *
- * param: int indx, an index for the packet for testing purposes
+ * @param: int indx, an index for the packet for testing purposes
  * return: NULL
  */
 void wire_analyze::uniqueUDPports(int indx) {
@@ -176,8 +172,8 @@ void wire_analyze::uniqueUDPports(int indx) {
  * this way, the map is able to count how many of the same UDP port
  * then, prints out the mapping data
  *
- * param: none
- * return: NULL
+ * @param: none
+ * @return: NULL
  */
 void wire_analyze::mapUDPports() {
    for (int i = 1; i <= packetInfo.size(); i++ ) {
@@ -210,8 +206,8 @@ void wire_analyze::mapUDPports() {
  * this way, the map is able to count how many of the same IP address for src & dest
  * then, prints out the mapping data
  *
- * param: none
- * return: NULL
+ * @param: none
+ * @return: NULL
  */
 void wire_analyze::mapIP() {
    for (int i = 1; i <= packetInfo.size(); i++) {
@@ -244,8 +240,8 @@ void wire_analyze::mapIP() {
  * this way, the map is able to count how many of the same MAC address
  * then, prints out the mapping data
  *
- * param: none
- * return: NULL
+ * @param: none
+ * @return: NULL
  */
 void wire_analyze::mapEth() {
    for (int i = 1; i <= packetInfo.size(); i++) {

@@ -30,9 +30,9 @@ int main (int argc, char *argv[]) {
 	if (pcap_loop(handle, -1, callback, (u_char*)&output) < 0) {
 		fprintf(stderr, "Error reading packets: %s\n", pcap_geterr(handle));
 		return 1;
-	} else {
-
-	} // These functions are described further in wire_analyze.cpp and handle printing and parsing of the final outputs
+	} 
+	
+	// These functions are described further in wire_analyze.cpp and handle printing and parsing of the final outputs
     analyze.printPackets();
 	analyze.mapEth();
 	analyze.mapIP();
@@ -47,9 +47,9 @@ int main (int argc, char *argv[]) {
  * determines presence of IP, ARP, and passes the packet by reference to handler functions to be filled with the recorded data
  * finally: sends the packet to the wire_analyze object to be mapped and parsed for output
  *
- * param: user_data, the program output data (our packet info struct cast as a u_char*)
- * param: pkthdr, the pcap packet header
- * param: packet, the packet data
+ * @param: user_data, the program output data (our packet info struct cast as a u_char*)
+ * @param: pkthdr, the pcap packet header
+ * @param: packet, the packet data
  * return: NULL
  */
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
