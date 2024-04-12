@@ -32,41 +32,51 @@ int main (int argc, char *argv[]) {
 		return 1;
 	} else {
 
-	}
-        analyze.printPackets();
+	} // These functions are described further in wire_analyze.cpp and handle printing and parsing of the final outputs
+    analyze.printPackets();
 	analyze.mapEth();
 	analyze.mapIP();
 	analyze.mapUDPports();
-        analyze.listARP();
+    analyze.listARP();
 	pcap_close(handle);
 	return 0;
 }
 
+/** callback
+ * passes a struct with all our program output info into pcap loop as a reference (user_data)
+ * determines presence of IP, ARP, and passes the packet by reference to handler functions to be filled with the recorded data
+ * finally: sends the packet to the wire_analyze object to be mapped and parsed for output
+ *
+ * param: user_data, the program output data (our packet info struct cast as a u_char*)
+ * param: pkthdr, the pcap packet header
+ * param: packet, the packet data
+ * return: NULL
+ */
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
-        static int count = 0;
-        static int max_pkt_len = 0;
-        static int min_pkt_len = 1000;
-        static int total_pkt_len = 0;
+	static int count = 0;
+	static int max_pkt_len = 0;
+	static int min_pkt_len = 1000;
+	static int total_pkt_len = 0;
 
-        struct prog_output* our_output = (struct prog_output*)user_data;
-        count++;
-        our_output->packet_number = count;
-        our_output->packet_time_info = *pkthdr;
+	struct prog_output* our_output = (struct prog_output*)user_data;
+	count++;
+	our_output->packet_number = count;			// records the count in our program output struct
+	our_output->packet_time_info = *pkthdr;		// records all packet header info (like time) in our struct
 
-        u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
-        if (ntohs(type) == ETHERTYPE_IP) {
-                handle_IP(user_data,pkthdr,packet);
-        } else if (ntohs(type) == ETHERTYPE_ARP) {
-                handle_ARP(user_data,pkthdr, packet);
-        }
+	u_int16_t type = handle_ethernet(user_data, pkthdr, packet);
+	if (ntohs(type) == ETHERTYPE_IP) {			// if IP is detected, we record its data
+			handle_IP(user_data,pkthdr,packet);	// our output data struct gets passed to each function
+	} else if (ntohs(type) == ETHERTYPE_ARP) {	// if ARP is detected, we record that data
+			handle_ARP(user_data,pkthdr, packet);
+	}
 
-        total_pkt_len += pkthdr->caplen;
-        if (pkthdr->caplen > max_pkt_len) {
-                max_pkt_len = pkthdr->caplen;
-        }
-        if (pkthdr->caplen < min_pkt_len) {
-                min_pkt_len = pkthdr->caplen;
-        }
-	analyze.setPacket(*our_output); // Add Packet to map
-        return;
+	total_pkt_len += pkthdr->caplen;			// we start recording some statistics on packet lengths
+	if (pkthdr->caplen > max_pkt_len) {
+			max_pkt_len = pkthdr->caplen;
+	}
+	if (pkthdr->caplen < min_pkt_len) {
+			min_pkt_len = pkthdr->caplen;
+	}
+	analyze.setPacket(*our_output); 			// Add Packet to our map after all data is added
+	return;
 }

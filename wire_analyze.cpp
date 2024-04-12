@@ -9,7 +9,13 @@
 wire_analyze::wire_analyze() {
 
 }
-
+/** setPacket
+ * grabs each packet during the execution of callback
+ * maps the packet and its callback index
+ *
+ * param: packet, the packet data
+ * return: NULL
+ */
 void wire_analyze::setPacket(struct prog_output packet) {
 	packetInfo.insert({packetNum++, packet});
 }
@@ -51,7 +57,12 @@ void wire_analyze::printPackets() {
     printf("Statistics -> MIN: %d MAX: %d AVERAGE: %f\n", minPacketSize, maxPacketSize, avgPacketSize);
 
 }
-
+/** testPrint
+ * test function to make sure packets were correctly mapped
+ *
+ * param: none
+ * return: NULL
+ */
 void wire_analyze::testPrint() {
 	std::map<int, struct prog_output>::iterator it = packetInfo.begin();
  
@@ -78,9 +89,12 @@ void wire_analyze::printTime(int indx) {
     printf("%s.%06ld", stringEpoch, elapsed);
 }
 
-/**
- * 
-*/
+/** listARP
+ * accesses and prints all ARP machine information contained within the packet_info struct map
+ *
+ * param: none
+ * return: NULL
+ */
 void wire_analyze::listARP() {
     // Write ARP machines to a list
     for (int i = 1; i <= packetInfo.size(); i++) {
@@ -100,6 +114,12 @@ void wire_analyze::listARP() {
     else printf("[NONE FOUND]\n");
 }
 
+/** printARP
+ * formats and prints the relevant ARP data
+ *
+ * param: struct prog_output machine
+ * return: NULL
+ */
 void wire_analyze::printARP(prog_output machine) {
     uint8_t* MAC_source = machine.arp_machine_info.arp_sha;
     uint8_t* MAC_destination = machine.arp_machine_info.arp_tha;
@@ -115,28 +135,50 @@ void wire_analyze::printARP(prog_output machine) {
     printf("ARP Protocol Address Length: %u\n", machine.arp_machine_info.ea_hdr.ar_pln);
     printf("ARP Protocol: %d\n", ntohs(machine.arp_machine_info.ea_hdr.ar_op));
 }
-
+/** uniqueEths
+ * casts, formats and prints the src and dest eth addresses for a given packet
+ *
+ * param: int indx, an index for the packet for testing purposes
+ * return: NULL
+ */
 void wire_analyze::uniqueEths(int indx) {
     uint8_t* sender = packetInfo.at(indx).eth_info.ether_shost;
     uint8_t* receiver = packetInfo.at(indx).eth_info.ether_dhost;
     printf("eth source %s\n", ether_ntoa((const struct ether_addr *)sender));
     printf("ethernet header destination %s\n", ether_ntoa((const struct ether_addr *)receiver));
 }
-
+/** uniqueIPs
+ * casts, formats and prints the src and dest IP addresses for a given packet
+ *
+ * param: int indx, an index for the packet for testing purposes
+ * return: NULL
+ */
 void wire_analyze::uniqueIPs(int indx) {
     struct in_addr sender = packetInfo.at(indx).ip_info.ip_src;
     struct in_addr receiver = packetInfo.at(indx).ip_info.ip_dst;
     printf("ip source %s\n", inet_ntoa(sender));
     printf("ip dest   %s\n", inet_ntoa(receiver));
 }
-
+/** uniqueEths
+ * casts, formats and prints the src and dest udp ports for a given packet
+ *
+ * param: int indx, an index for the packet for testing purposes
+ * return: NULL
+ */
 void wire_analyze::uniqueUDPports(int indx) {
    uint16_t sender = packetInfo.at(indx).udp_info.source;
    uint16_t receiver = packetInfo.at(indx).udp_info.dest;
    printf("udp src port %u\n", ntohs(sender));
    printf("udp dest port %u\n", ntohs(receiver));
 }
-
+/** mapUDPports
+ * casts and maps the src and dest udp ports for all packets
+ * this way, the map is able to count how many of the same UDP port
+ * then, prints out the mapping data
+ *
+ * param: none
+ * return: NULL
+ */
 void wire_analyze::mapUDPports() {
    for (int i = 1; i <= packetInfo.size(); i++ ) {
         uint16_t senderKey = ntohs(packetInfo.at(i).udp_info.source);
@@ -163,7 +205,14 @@ void wire_analyze::mapUDPports() {
       	++itr;
    }
 }
-
+/** mapIP
+ * casts and maps the src and dest IP addresses for all packets
+ * this way, the map is able to count how many of the same IP address for src & dest
+ * then, prints out the mapping data
+ *
+ * param: none
+ * return: NULL
+ */
 void wire_analyze::mapIP() {
    for (int i = 1; i <= packetInfo.size(); i++) {
 	std::string senderKey = inet_ntoa(packetInfo.at(i).ip_info.ip_src);
@@ -190,7 +239,14 @@ void wire_analyze::mapIP() {
       ++itr;
    }	   
 }
-
+/** mapEth
+ * casts and maps the src and dest ethernet addresses for all packets
+ * this way, the map is able to count how many of the same MAC address
+ * then, prints out the mapping data
+ *
+ * param: none
+ * return: NULL
+ */
 void wire_analyze::mapEth() {
    for (int i = 1; i <= packetInfo.size(); i++) {
 	std::string senderKey = ether_ntoa((const struct ether_addr*)packetInfo.at(i).eth_info.ether_shost);
@@ -216,38 +272,4 @@ void wire_analyze::mapEth() {
 	std::cout << "dest eth addr " << itr->first << " in " << itr->second << " packets" << std::endl;
 	++itr;
    }
-
 }
-
-// int main() {
-
-// 	std::map<int, struct prog_output> packetInfo;
-
-// 	struct prog_output a;
-// 	a.packet_number = 1;
-// 	struct prog_output b;
-// 	b.packet_number = 100;
-
-// 	packetInfo[8] = a;
-// 	packetInfo[42] = b;
-
-// 	// Get an iterator pointing to the first element in the
-//     // map
-    // std::map<int, struct prog_output>::iterator it = packetInfo.begin();
- 
-    // // Iterate through the map and print the elements
-    // while (it != packetInfo.end()) {
-    //     std::cout << "Key: " << it->first
-    //          << ", Value: " << (it->second).packet_number << std::endl;
-    //     ++it;
-    // }
-
-// 	/*
-// 	std::string line;
-// 	while(std::getline(std::cin, line)) {
-// 		std::cout << "line" << std::endl;
-// 		std::cout << line << std::endl;
-// 	}
-// 	*/
-// 	return 0;
-// }
