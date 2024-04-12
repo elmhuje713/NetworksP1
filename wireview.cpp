@@ -43,14 +43,13 @@ int main (int argc, char *argv[]) {
 }
 
 /** callback
- * passes a struct with all our program output info into pcap loop as a reference (user_data)
+ * Passes a struct with all our program output info into pcap loop as a reference (user_data)
  * determines presence of IP, ARP, and passes the packet by reference to handler functions to be filled with the recorded data
  * finally: sends the packet to the wire_analyze object to be mapped and parsed for output
  *
- * @param: user_data, the program output data (our packet info struct cast as a u_char*)
- * @param: pkthdr, the pcap packet header
- * @param: packet, the packet data
- * return: NULL
+ * @param user_data: the program output data (our packet info struct cast as a u_char*)
+ * @param pkthdr: the pcap packet header
+ * @param packet: the packet data
  */
 void callback(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 	static int count = 0;

@@ -1,11 +1,12 @@
 #include "wire_handlers.h"
+
 /** handle_ethernet
  * Handles the ethernet header
  *
- * param: user_data, the program output data (our packet info struct cast as a u_char*)
- * param: pkthdr, the pcap packet header
- * param: packet, the packet data
- * return: NULL
+ * @param user_data: the program output data (our packet info struct cast as a u_char*)
+ * @param pkthdr: the pcap packet header
+ * @param packet: the packet data
+ * @return ether_type
  */
 u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
 	struct prog_output* our_output = (struct prog_output*)user_data;
@@ -17,13 +18,13 @@ u_int16_t handle_ethernet(u_char *user_data, const struct pcap_pkthdr* pkthdr, c
 	}
 	return eptr->ether_type;
 }
+
 /** process_ip
  * Handles the IP header, namely TCP/UDP info.
  *
- * param: user_data, the program output data (our packet info struct cast as a u_char*)
- * param: pkthdr, the pcap packet header
- * param: packet, the packet data
- * return: NULL
+ * @param user_data: the program output data (our packet info struct cast as a u_char*)
+ * @param pkthdr: the pcap packet header
+ * @param packet: the packet data
  */
 void process_ip(u_char *user_data, const u_char *packet, int packet_len) { 
 	struct prog_output* our_output = (struct prog_output*)user_data;
@@ -42,13 +43,14 @@ void process_ip(u_char *user_data, const u_char *packet, int packet_len) {
 	}
 	return;
 }
+
 /** handle_IP
  * Handles the IP header.
  *
- * param: user_data, the program output data (our packet info struct cast as a u_char*)
- * param: pkthdr, the pcap packet header
- * param: packet, the packet data
- * return: NULL
+ * @param user_data: the program output data (our packet info struct cast as a u_char*)
+ * @param pkthdr: the pcap packet header
+ * @param packet: the packet data
+ * @return NULL
  */
 u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet) {
 	const struct my_ip* ip;
@@ -61,13 +63,13 @@ u_char* handle_IP(u_char *user_data, const struct pcap_pkthdr* pkthdr, const u_c
 	process_ip(user_data, packet, length);
 	return NULL;
 }
+
 /** handle_ARP
  * Handles the ARP header and machine info
  *
- * param: user_data, the program output data (our packet info struct cast as a u_char*)
- * param: pkthdr, the pcap packet header
- * param: packet, the packet data
- * return: NULL
+ * @param user_data: the program output data (our packet info struct cast as a u_char*)
+ * @param pkthdr: the pcap packet header
+ * @param packet: the packet data
  */
 void handle_ARP(u_char *user_data, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 	struct prog_output* our_output = (struct prog_output*)user_data;

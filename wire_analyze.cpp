@@ -55,10 +55,7 @@ void wire_analyze::printPackets() {
 
 }
 /** testPrint
- * test function to make sure packets were correctly mapped
- *
- * @param: none
- * @return: NULL
+ * Test function to make sure packets were correctly mapped
  */
 void wire_analyze::testPrint() {
 	std::map<int, struct prog_output>::iterator it = packetInfo.begin();
@@ -74,7 +71,7 @@ void wire_analyze::testPrint() {
 /**
  * Prints the EPOCH time for a set packet
  * @param indx packetNum for what packet to print
-*/
+ */
 void wire_analyze::printTime(int indx) {
     __time_t timeEpoch = packetInfo.at(indx).packet_time_info.ts.tv_sec;
     __suseconds_t elapsed = packetInfo.at(indx).packet_time_info.ts.tv_usec;
@@ -88,9 +85,6 @@ void wire_analyze::printTime(int indx) {
 
 /** listARP
  * Accesses and prints all ARP machine information contained within the packet_info struct map
- *
- * @param: none
- * @return: NULL
  */
 void wire_analyze::listARP() {
     // Write ARP machines to a list
@@ -114,7 +108,7 @@ void wire_analyze::listARP() {
 /** printARP
  * Formats and prints the relevant ARP data
  *
- * @param: struct prog_output machine
+ * @param machine: ARP machine input
  */
 void wire_analyze::printARP(prog_output machine) {
     uint8_t* MAC_source = machine.arp_machine_info.arp_sha;
@@ -132,10 +126,9 @@ void wire_analyze::printARP(prog_output machine) {
     printf("ARP Protocol: %d\n", ntohs(machine.arp_machine_info.ea_hdr.ar_op));
 }
 /** uniqueEths
- * casts, formats and prints the src and dest eth addresses for a given packet
+ * Casts, formats and prints the src and dest eth addresses for a given packet
  *
- * @param: int indx, an index for the packet for testing purposes
- * @return: NULL
+ * @param indx: an index for the packet for testing purposes
  */
 void wire_analyze::uniqueEths(int indx) {
     uint8_t* sender = packetInfo.at(indx).eth_info.ether_shost;
@@ -144,10 +137,9 @@ void wire_analyze::uniqueEths(int indx) {
     printf("ethernet header destination %s\n", ether_ntoa((const struct ether_addr *)receiver));
 }
 /** uniqueIPs
- * casts, formats and prints the src and dest IP addresses for a given packet
+ * Casts, formats and prints the src and dest IP addresses for a given packet
  *
- * @param: int indx, an index for the packet for testing purposes
- * @return: NULL
+ * @param indx: an index for the packet for testing purposes
  */
 void wire_analyze::uniqueIPs(int indx) {
     struct in_addr sender = packetInfo.at(indx).ip_info.ip_src;
@@ -156,10 +148,9 @@ void wire_analyze::uniqueIPs(int indx) {
     printf("ip dest   %s\n", inet_ntoa(receiver));
 }
 /** uniqueEths
- * casts, formats and prints the src and dest udp ports for a given packet
+ * Casts, formats and prints the src and dest udp ports for a given packet
  *
- * @param: int indx, an index for the packet for testing purposes
- * return: NULL
+ * @param indx: an index for the packet for testing purposes
  */
 void wire_analyze::uniqueUDPports(int indx) {
    uint16_t sender = packetInfo.at(indx).udp_info.source;
@@ -168,12 +159,9 @@ void wire_analyze::uniqueUDPports(int indx) {
    printf("udp dest port %u\n", ntohs(receiver));
 }
 /** mapUDPports
- * casts and maps the src and dest udp ports for all packets
+ * Casts and maps the src and dest udp ports for all packets
  * this way, the map is able to count how many of the same UDP port
  * then, prints out the mapping data
- *
- * @param: none
- * @return: NULL
  */
 void wire_analyze::mapUDPports() {
    for (int i = 1; i <= packetInfo.size(); i++ ) {
@@ -205,9 +193,6 @@ void wire_analyze::mapUDPports() {
  * casts and maps the src and dest IP addresses for all packets
  * this way, the map is able to count how many of the same IP address for src & dest
  * then, prints out the mapping data
- *
- * @param: none
- * @return: NULL
  */
 void wire_analyze::mapIP() {
    for (int i = 1; i <= packetInfo.size(); i++) {
@@ -236,12 +221,9 @@ void wire_analyze::mapIP() {
    }	   
 }
 /** mapEth
- * casts and maps the src and dest ethernet addresses for all packets
+ * Casts and maps the src and dest ethernet addresses for all packets
  * this way, the map is able to count how many of the same MAC address
  * then, prints out the mapping data
- *
- * @param: none
- * @return: NULL
  */
 void wire_analyze::mapEth() {
    for (int i = 1; i <= packetInfo.size(); i++) {
